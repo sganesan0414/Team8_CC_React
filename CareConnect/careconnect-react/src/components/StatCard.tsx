@@ -1,4 +1,5 @@
-import type { LucideIcon } from 'lucide-react'
+import { View, Text } from 'react-native'
+import type { LucideIcon } from 'lucide-react-native'
 import { C, T } from '../theme/styles'
 
 interface Props {
@@ -10,28 +11,27 @@ interface Props {
 
 export default function StatCard({ icon: Icon, iconColor, value, label }: Props) {
   return (
-    <div style={{
-      background: C.surface,
+    <View style={{
+      backgroundColor: C.surface,
       borderRadius: 14,
-      border: `1px solid ${C.border}`,
-      padding: '14px 12px',
-      display: 'flex',
-      flexDirection: 'column',
+      borderWidth: 1,
+      borderColor: C.border,
+      padding: 14,
+      paddingHorizontal: 12,
       gap: 6,
     }}>
-      <div style={{
+      <View style={{
         width: 36,
         height: 36,
-        borderRadius: '50%',
-        background: iconColor + '18',
-        display: 'flex',
+        borderRadius: 18,
+        backgroundColor: iconColor + '18',
         alignItems: 'center',
         justifyContent: 'center',
       }}>
         <Icon size={18} color={iconColor} />
-      </div>
-      <span style={{ ...T.headlineMedium, fontSize: 20 }}>{value}</span>
-      <span style={{ ...T.caption }}>{label}</span>
-    </div>
+      </View>
+      <Text style={{ ...T.headlineMedium, fontSize: 20 }}>{value}</Text>
+      <Text style={{ ...T.caption }}>{label}</Text>
+    </View>
   )
 }

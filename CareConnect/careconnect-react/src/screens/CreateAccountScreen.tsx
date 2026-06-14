@@ -1,11 +1,16 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Shield, Mail, Lock, User, Eye, EyeOff, UserPlus, ArrowLeft } from 'lucide-react'
+import { View, Text, TextInput, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native'
+import { useNavigation } from '@react-navigation/native'
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { Shield, Mail, Lock, User, Eye, EyeOff, UserPlus, ArrowLeft } from 'lucide-react-native'
 import { useAccountStore } from '../store/accountStore'
 import { C, T, btnPrimary, inputBase } from '../theme/styles'
+import type { RootStackParamList } from '../App'
+
+type Nav = NativeStackNavigationProp<RootStackParamList>
 
 export default function CreateAccountScreen() {
-  const navigate = useNavigate()
+  const navigation = useNavigation<Nav>()
   const { signIn } = useAccountStore()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -17,77 +22,86 @@ export default function CreateAccountScreen() {
     if (isLoading || !name || !email || !password) return
     setIsLoading(true)
     await signIn(email, password)
-    navigate('/dashboard', { replace: true })
   }
 
   return (
-    <div style={{ flex: 1, overflowY: 'auto', background: C.surface }}>
-      <div style={{ padding: '40px 28px' }}>
+    <ScrollView style={{ flex: 1, backgroundColor: C.surface }} contentContainerStyle={{ padding: 40, paddingHorizontal: 28 }}>
 
-        {/* Back */}
-        <button
-          onClick={() => navigate('/login')}
-          style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', color: C.textSecondary, cursor: 'pointer', marginBottom: 32, padding: 0 }}
-        >
-          <ArrowLeft size={20} />
-          <span style={{ ...T.bodyMedium }}>Back to Sign In</span>
-        </button>
+      {/* Back */}
+      <TouchableOpacity
+        onPress={() => navigation.goBack()}
+        style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 32 }}
+      >
+        <ArrowLeft size={20} color={C.textSecondary} />
+        <Text style={{ ...T.bodyMedium }}>Back to Sign In</Text>
+      </TouchableOpacity>
 
-        {/* Logo */}
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
-          <div style={{ width: 72, height: 72, background: C.primary, borderRadius: 18, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Shield size={38} color="white" />
-          </div>
-        </div>
+      {/* Logo */}
+      <View style={{ alignItems: 'center', marginBottom: 24 }}>
+        <View style={{ width: 72, height: 72, backgroundColor: C.primary, borderRadius: 18, alignItems: 'center', justifyContent: 'center' }}>
+          <Shield size={38} color="white" />
+        </View>
+      </View>
 
-        <h1 style={{ ...T.displayLarge, textAlign: 'center', marginBottom: 8 }}>Create Account</h1>
-        <p style={{ ...T.bodyMedium, textAlign: 'center', marginBottom: 36 }}>Join CareConnect to manage your health</p>
+      <Text style={{ ...T.displayLarge, textAlign: 'center', marginBottom: 8 }}>Create Account</Text>
+      <Text style={{ ...T.bodyMedium, textAlign: 'center', marginBottom: 36 }}>Join CareConnect to manage your health</Text>
 
-        {/* Full name */}
-        <label style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 16 }}>
-          <span style={{ ...T.labelMedium }}>Full Name</span>
-          <div style={{ position: 'relative' }}>
-            <User size={18} color={C.textMuted} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
-            <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Jane Doe" style={{ ...inputBase, paddingLeft: 44 }} />
-          </div>
-        </label>
+      {/* Full Name */}
+      <View style={{ gap: 6, marginBottom: 16 }}>
+        <Text style={{ ...T.labelMedium }}>Full Name</Text>
+        <View style={{ position: 'relative' }}>
+          <View style={{ position: 'absolute', left: 14, top: 0, bottom: 0, justifyContent: 'center', zIndex: 1 }}>
+            <User size={18} color={C.textMuted} />
+          </View>
+          <TextInput value={name} onChangeText={setName} placeholder="Jane Doe" style={{ ...inputBase, paddingLeft: 44 }} />
+        </View>
+      </View>
 
-        {/* Email */}
-        <label style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 16 }}>
-          <span style={{ ...T.labelMedium }}>Email</span>
-          <div style={{ position: 'relative' }}>
-            <Mail size={18} color={C.textMuted} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="jane@example.com" style={{ ...inputBase, paddingLeft: 44 }} />
-          </div>
-        </label>
+      {/* Email */}
+      <View style={{ gap: 6, marginBottom: 16 }}>
+        <Text style={{ ...T.labelMedium }}>Email</Text>
+        <View style={{ position: 'relative' }}>
+          <View style={{ position: 'absolute', left: 14, top: 0, bottom: 0, justifyContent: 'center', zIndex: 1 }}>
+            <Mail size={18} color={C.textMuted} />
+          </View>
+          <TextInput value={email} onChangeText={setEmail} placeholder="jane@example.com" keyboardType="email-address" autoCapitalize="none" style={{ ...inputBase, paddingLeft: 44 }} />
+        </View>
+      </View>
 
-        {/* Password */}
-        <label style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 28 }}>
-          <span style={{ ...T.labelMedium }}>Password</span>
-          <div style={{ position: 'relative' }}>
-            <Lock size={18} color={C.textMuted} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
-            <input
-              type={showPassword ? 'text' : 'password'}
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              placeholder="Create a strong password"
-              style={{ ...inputBase, paddingLeft: 44, paddingRight: 48 }}
-            />
-            <button type="button" onClick={() => setShowPassword(!showPassword)}
-              style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: C.textMuted, display: 'flex', alignItems: 'center' }}>
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
-          </div>
-        </label>
+      {/* Password */}
+      <View style={{ gap: 6, marginBottom: 28 }}>
+        <Text style={{ ...T.labelMedium }}>Password</Text>
+        <View style={{ position: 'relative' }}>
+          <View style={{ position: 'absolute', left: 14, top: 0, bottom: 0, justifyContent: 'center', zIndex: 1 }}>
+            <Lock size={18} color={C.textMuted} />
+          </View>
+          <TextInput
+            value={password}
+            onChangeText={setPassword}
+            placeholder="Create a strong password"
+            secureTextEntry={!showPassword}
+            style={{ ...inputBase, paddingLeft: 44, paddingRight: 48 }}
+          />
+          <TouchableOpacity
+            onPress={() => setShowPassword(!showPassword)}
+            style={{ position: 'absolute', right: 12, top: 0, bottom: 0, justifyContent: 'center' }}
+          >
+            {showPassword ? <EyeOff size={18} color={C.textMuted} /> : <Eye size={18} color={C.textMuted} />}
+          </TouchableOpacity>
+        </View>
+      </View>
 
-        <button
-          onClick={handleCreate}
-          disabled={isLoading || !name || !email || !password}
-          style={{ ...btnPrimary, opacity: (isLoading || !name || !email || !password) ? 0.6 : 1 }}
-        >
-          {isLoading ? <span>Creating account…</span> : <><UserPlus size={20} /><span>Create Account</span></>}
-        </button>
-      </div>
-    </div>
+      <TouchableOpacity
+        onPress={handleCreate}
+        disabled={isLoading || !name || !email || !password}
+        style={{ ...btnPrimary, opacity: (isLoading || !name || !email || !password) ? 0.6 : 1 }}
+      >
+        {isLoading
+          ? <ActivityIndicator size="small" color="white" />
+          : <><UserPlus size={20} color={C.textOnPrimary} /><Text style={{ color: C.textOnPrimary, fontSize: 16, fontWeight: '600' }}>Create Account</Text></>
+        }
+      </TouchableOpacity>
+
+    </ScrollView>
   )
 }

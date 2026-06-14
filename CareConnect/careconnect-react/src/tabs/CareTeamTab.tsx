@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Phone, Mail, Shield, Plus, Trash2, AlertTriangle, Users } from 'lucide-react'
+import { View, Text, TextInput, TouchableOpacity } from 'react-native'
+import { Phone, Mail, Shield, Plus, Trash2, AlertTriangle, Users } from 'lucide-react-native'
 import { useCareTeamStore } from '../store/careTeamStore'
 import StatCard from '../components/StatCard'
 import AlertBanner from '../components/AlertBanner'
@@ -26,15 +27,15 @@ export default function CareTeamTab({ onNavChange: _ }: Props) {
   }
 
   return (
-    <div style={{ padding: 20 }}>
+    <View style={{ padding: 20 }}>
       {/* Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
-        <StatCard icon={Users}  iconColor={C.primary} value={String(members.length)} label="Total Members" />
-        <StatCard icon={Shield} iconColor={C.red}     value={String(emergencyContactCount)} label="Emergency Contacts" />
-      </div>
+      <View style={{ flexDirection: 'row', gap: 12, marginBottom: 16 }}>
+        <View style={{ flex: 1 }}><StatCard icon={Users}  iconColor={C.primary} value={String(members.length)} label="Total Members" /></View>
+        <View style={{ flex: 1 }}><StatCard icon={Shield} iconColor={C.red}     value={String(emergencyContactCount)} label="Emergency Contacts" /></View>
+      </View>
 
       {emergencyContactCount === 0 && (
-        <div style={{ marginBottom: 16 }}>
+        <View style={{ marginBottom: 16 }}>
           <AlertBanner
             icon={AlertTriangle}
             title="No Emergency Contact"
@@ -42,49 +43,74 @@ export default function CareTeamTab({ onNavChange: _ }: Props) {
             actionLabel="Add Emergency Contact"
             onAction={() => setShowForm(true)}
           />
-        </div>
+        </View>
       )}
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <h2 style={{ ...T.headlineMedium }}>Care Team Members</h2>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          style={{ background: C.primary, border: 'none', color: 'white', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, fontSize: 14, fontWeight: 600 }}
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <Text style={{ ...T.headlineMedium }}>Care Team Members</Text>
+        <TouchableOpacity
+          onPress={() => setShowForm(!showForm)}
+          style={{ backgroundColor: C.primary, borderRadius: 8, paddingVertical: 6, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', gap: 4 }}
         >
-          <Plus size={16} /> Add
-        </button>
-      </div>
+          <Plus size={16} color="white" />
+          <Text style={{ color: 'white', fontSize: 14, fontWeight: '600' }}>Add</Text>
+        </TouchableOpacity>
+      </View>
 
-      {/* Add form */}
       {showForm && (
-        <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 16, padding: 16, marginBottom: 20 }}>
-          <h3 style={{ ...T.titleLarge, marginBottom: 12 }}>New Team Member</h3>
+        <View style={{ backgroundColor: C.surface, borderWidth: 1, borderColor: C.border, borderRadius: 16, padding: 16, marginBottom: 20 }}>
+          <Text style={{ ...T.titleLarge, marginBottom: 12 }}>New Team Member</Text>
           {[
-            { label: 'Full Name *', value: name,  setter: setName,  type: 'text',  placeholder: 'Dr. Jane Smith' },
-            { label: 'Role *',      value: role,  setter: setRole,  type: 'text',  placeholder: 'Cardiologist' },
-            { label: 'Phone',       value: phone, setter: setPhone, type: 'tel',   placeholder: '(555) 000-0000' },
-            { label: 'Email',       value: email, setter: setEmail, type: 'email', placeholder: 'doctor@hospital.com' },
+            { label: 'Full Name *', value: name,  setter: setName,  keyboard: 'default' as const, placeholder: 'Dr. Jane Smith' },
+            { label: 'Role *',      value: role,  setter: setRole,  keyboard: 'default' as const, placeholder: 'Cardiologist' },
+            { label: 'Phone',       value: phone, setter: setPhone, keyboard: 'phone-pad' as const, placeholder: '(555) 000-0000' },
+            { label: 'Email',       value: email, setter: setEmail, keyboard: 'email-address' as const, placeholder: 'doctor@hospital.com' },
           ].map(f => (
-            <label key={f.label} style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 10 }}>
-              <span style={{ ...T.labelMedium }}>{f.label}</span>
-              <input type={f.type} value={f.value} onChange={e => f.setter(e.target.value)} placeholder={f.placeholder} style={{ ...inputBase }} />
-            </label>
+            <View key={f.label} style={{ gap: 4, marginBottom: 10 }}>
+              <Text style={{ ...T.labelMedium }}>{f.label}</Text>
+              <TextInput value={f.value} onChangeText={f.setter} placeholder={f.placeholder} keyboardType={f.keyboard} style={{ ...inputBase }} />
+            </View>
           ))}
-          <label style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14, cursor: 'pointer' }}>
-            <input type="checkbox" checked={isEmergency} onChange={e => setIsEmergency(e.target.checked)} style={{ width: 18, height: 18 }} />
-            <span style={{ ...T.bodyMedium }}>Set as Emergency Contact</span>
-          </label>
-          <div style={{ display: 'flex', gap: 10 }}>
-            <button onClick={handleAdd} disabled={!name || !role} style={{ flex: 1, padding: '12px 0', borderRadius: 10, background: C.primary, color: 'white', border: 'none', fontWeight: 600, cursor: 'pointer', opacity: (!name || !role) ? 0.5 : 1 }}>Add Member</button>
-            <button onClick={() => setShowForm(false)} style={{ flex: 1, padding: '12px 0', borderRadius: 10, border: `1.5px solid ${C.border}`, background: 'transparent', cursor: 'pointer', fontWeight: 600 }}>Cancel</button>
-          </div>
-        </div>
+
+          {/* Emergency contact toggle */}
+          <TouchableOpacity
+            onPress={() => setIsEmergency(!isEmergency)}
+            style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 14 }}
+          >
+            <View style={{
+              width: 22, height: 22,
+              borderWidth: 2, borderColor: isEmergency ? C.primary : C.border,
+              borderRadius: 4,
+              backgroundColor: isEmergency ? C.primary : 'transparent',
+              alignItems: 'center', justifyContent: 'center',
+            }}>
+              {isEmergency && <Text style={{ color: 'white', fontSize: 13, fontWeight: '700' }}>✓</Text>}
+            </View>
+            <Text style={{ ...T.bodyMedium }}>Set as Emergency Contact</Text>
+          </TouchableOpacity>
+
+          <View style={{ flexDirection: 'row', gap: 10 }}>
+            <TouchableOpacity
+              onPress={handleAdd}
+              disabled={!name || !role}
+              style={{ flex: 1, paddingVertical: 12, borderRadius: 10, backgroundColor: C.primary, alignItems: 'center', opacity: (!name || !role) ? 0.5 : 1 }}
+            >
+              <Text style={{ color: 'white', fontWeight: '600' }}>Add Member</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setShowForm(false)}
+              style={{ flex: 1, paddingVertical: 12, borderRadius: 10, borderWidth: 1.5, borderColor: C.border, backgroundColor: 'transparent', alignItems: 'center' }}
+            >
+              <Text style={{ fontWeight: '600', color: C.textPrimary }}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       )}
 
       {members.map(member => (
         <MemberCard key={member.id} member={member} onRemove={() => removeMember(member.id)} />
       ))}
-    </div>
+    </View>
   )
 }
 
@@ -92,52 +118,45 @@ function MemberCard({ member, onRemove }: { member: CareTeamMember; onRemove: ()
   const initials = member.name.split(' ').map(w => w[0]).slice(0, 2).join('')
 
   return (
-    <div
-      aria-label={`${member.name}, ${member.role}${member.isEmergencyContact ? ', Emergency Contact' : ''}`}
-      style={{
-        background: C.surface,
-        border: `1.5px solid ${member.isEmergencyContact ? C.red + '66' : C.border}`,
-        borderRadius: 16, padding: 16, marginBottom: 12,
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 12 }}>
-        <div style={{ width: 48, height: 48, borderRadius: '50%', background: C.primary + '18', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-          <span style={{ ...T.titleLarge, color: C.primary }}>{initials}</span>
-        </div>
-        <div style={{ flex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
-            <span style={{ ...T.labelLarge }}>{member.name}</span>
+    <View style={{ backgroundColor: C.surface, borderWidth: 1.5, borderColor: member.isEmergencyContact ? C.red + '66' : C.border, borderRadius: 16, padding: 16, marginBottom: 12 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 12 }}>
+        <View style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: C.primary + '18', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <Text style={{ ...T.titleLarge, color: C.primary }}>{initials}</Text>
+        </View>
+        <View style={{ flex: 1 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 2 }}>
+            <Text style={{ ...T.labelLarge }}>{member.name}</Text>
             {member.isEmergencyContact && (
-              <span style={{ background: C.red + '18', border: `1px solid ${C.red}`, color: C.red, borderRadius: 20, padding: '2px 8px', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>
-                Emergency
-              </span>
+              <View style={{ backgroundColor: C.red + '18', borderWidth: 1, borderColor: C.red, borderRadius: 20, paddingVertical: 2, paddingHorizontal: 8 }}>
+                <Text style={{ fontSize: 11, fontWeight: '700', color: C.red }}>Emergency</Text>
+              </View>
             )}
-          </div>
-          <span style={{ ...T.bodyMedium }}>{member.role}</span>
-        </div>
-        <button onClick={onRemove} title="Remove member" style={{ background: 'none', border: 'none', cursor: 'pointer', color: C.textMuted, padding: 6 }}>
-          <Trash2 size={18} />
-        </button>
-      </div>
+          </View>
+          <Text style={{ ...T.bodyMedium }}>{member.role}</Text>
+        </View>
+        <TouchableOpacity onPress={onRemove} style={{ padding: 6 }}>
+          <Trash2 size={18} color={C.textMuted} />
+        </TouchableOpacity>
+      </View>
 
-      <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+      <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
         {member.phone && (
-          <div style={{ flex: 1, background: C.surfaceVariant, borderRadius: 8, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 6, overflow: 'hidden' }}>
+          <View style={{ flex: 1, backgroundColor: C.surfaceVariant, borderRadius: 8, paddingVertical: 6, paddingHorizontal: 10, flexDirection: 'row', alignItems: 'center', gap: 6, overflow: 'hidden' }}>
             <Phone size={14} color={C.textMuted} />
-            <span style={{ ...T.caption, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{member.phone}</span>
-          </div>
+            <Text numberOfLines={1} style={{ ...T.caption }}>{member.phone}</Text>
+          </View>
         )}
         {member.email && (
-          <div style={{ flex: 1, background: C.surfaceVariant, borderRadius: 8, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 6, overflow: 'hidden' }}>
+          <View style={{ flex: 1, backgroundColor: C.surfaceVariant, borderRadius: 8, paddingVertical: 6, paddingHorizontal: 10, flexDirection: 'row', alignItems: 'center', gap: 6, overflow: 'hidden' }}>
             <Mail size={14} color={C.textMuted} />
-            <span style={{ ...T.caption, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{member.email}</span>
-          </div>
+            <Text numberOfLines={1} style={{ ...T.caption }}>{member.email}</Text>
+          </View>
         )}
-      </div>
+      </View>
 
-      <button style={{ width: '100%', padding: '12px 0', borderRadius: 12, border: `1.5px solid ${C.border}`, background: 'transparent', cursor: 'pointer', color: C.textSecondary, fontWeight: 600, fontSize: 15 }}>
-        Manage Access
-      </button>
-    </div>
+      <TouchableOpacity style={{ width: '100%', paddingVertical: 12, borderRadius: 12, borderWidth: 1.5, borderColor: C.border, backgroundColor: 'transparent', alignItems: 'center' }}>
+        <Text style={{ color: C.textSecondary, fontWeight: '600', fontSize: 15 }}>Manage Access</Text>
+      </TouchableOpacity>
+    </View>
   )
 }

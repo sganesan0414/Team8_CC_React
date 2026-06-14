@@ -1,3 +1,4 @@
+import { View, Text } from 'react-native'
 import { C } from '../theme/styles'
 
 interface Props {
@@ -6,15 +7,14 @@ interface Props {
 
 export default function ContextBar({ label }: Props) {
   return (
-    <div style={{
-      background: C.surfaceVariant,
-      borderBottom: `1px solid ${C.border}`,
-      padding: '8px 20px',
-      fontSize: 13,
-      color: C.textMuted,
-      fontWeight: 500,
+    <View style={{
+      backgroundColor: C.surfaceVariant,
+      borderBottomWidth: 1,
+      borderBottomColor: C.border,
+      paddingVertical: 8,
+      paddingHorizontal: 20,
     }}>
-      {label}
-    </div>
+      <Text style={{ fontSize: 13, color: C.textMuted, fontWeight: '500' }}>{label}</Text>
+    </View>
   )
 }

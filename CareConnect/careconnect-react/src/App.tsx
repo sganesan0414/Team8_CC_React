@@ -1,4 +1,6 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { NavigationContainer } from '@react-navigation/native'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { useAccountStore } from './store/accountStore'
 import LoginScreen from './screens/LoginScreen'
 import CreateAccountScreen from './screens/CreateAccountScreen'
@@ -9,25 +11,43 @@ import PharmacyScreen from './screens/PharmacyScreen'
 import UserProfileScreen from './screens/UserProfileScreen'
 import SettingsScreen from './screens/SettingsScreen'
 
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const isLoggedIn = useAccountStore(s => s.isLoggedIn)
-  return isLoggedIn ? <>{children}</> : <Navigate to="/login" replace />
+export type RootStackParamList = {
+  Login: undefined
+  CreateAccount: undefined
+  Dashboard: undefined
+  HealthMetrics: undefined
+  HealthReports: undefined
+  Pharmacy: undefined
+  Profile: undefined
+  Settings: undefined
 }
 
+const Stack = createNativeStackNavigator<RootStackParamList>()
+
 export default function App() {
+  const isLoggedIn = useAccountStore(s => s.isLoggedIn)
+
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<LoginScreen />} />
-        <Route path="/create-account" element={<CreateAccountScreen />} />
-        <Route path="/dashboard" element={<ProtectedRoute><DashboardScreen /></ProtectedRoute>} />
-        <Route path="/health-metrics" element={<ProtectedRoute><HealthMetricsScreen /></ProtectedRoute>} />
-        <Route path="/health-reports" element={<ProtectedRoute><HealthReportsScreen /></ProtectedRoute>} />
-        <Route path="/pharmacy" element={<ProtectedRoute><PharmacyScreen /></ProtectedRoute>} />
-        <Route path="/profile" element={<ProtectedRoute><UserProfileScreen /></ProtectedRoute>} />
-        <Route path="/settings" element={<ProtectedRoute><SettingsScreen /></ProtectedRoute>} />
-        <Route path="*" element={<Navigate to="/login" replace />} />
-      </Routes>
-    </BrowserRouter>
+    <SafeAreaProvider>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
+          {!isLoggedIn ? (
+            <>
+              <Stack.Screen name="Login" component={LoginScreen} />
+              <Stack.Screen name="CreateAccount" component={CreateAccountScreen} />
+            </>
+          ) : (
+            <>
+              <Stack.Screen name="Dashboard" component={DashboardScreen} />
+              <Stack.Screen name="HealthMetrics" component={HealthMetricsScreen} />
+              <Stack.Screen name="HealthReports" component={HealthReportsScreen} />
+              <Stack.Screen name="Pharmacy" component={PharmacyScreen} />
+              <Stack.Screen name="Profile" component={UserProfileScreen} />
+              <Stack.Screen name="Settings" component={SettingsScreen} />
+            </>
+          )}
+        </Stack.Navigator>
+      </NavigationContainer>
+    </SafeAreaProvider>
   )
 }

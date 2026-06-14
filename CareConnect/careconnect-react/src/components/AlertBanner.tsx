@@ -1,4 +1,5 @@
-import type { LucideIcon } from 'lucide-react'
+import { View, Text, TouchableOpacity } from 'react-native'
+import type { LucideIcon } from 'lucide-react-native'
 import { C, T } from '../theme/styles'
 
 interface Props {
@@ -11,37 +12,29 @@ interface Props {
 
 export default function AlertBanner({ icon: Icon, title, body, actionLabel, onAction }: Props) {
   return (
-    <div style={{
-      background: C.alertBg,
-      border: `1.5px solid ${C.alertBorder}`,
+    <View style={{
+      backgroundColor: C.alertBg,
+      borderWidth: 1.5,
+      borderColor: C.alertBorder,
       borderRadius: 14,
-      padding: '14px 16px',
-      display: 'flex',
+      padding: 14,
+      paddingHorizontal: 16,
+      flexDirection: 'row',
       gap: 12,
       alignItems: 'flex-start',
     }}>
-      <Icon size={20} color={C.warning} style={{ flexShrink: 0, marginTop: 2 }} />
-      <div style={{ flex: 1 }}>
-        <p style={{ ...T.labelLarge, marginBottom: 2 }}>{title}</p>
-        <p style={{ ...T.bodyMedium, fontSize: 14 }}>{body}</p>
+      <View style={{ flexShrink: 0, marginTop: 2 }}>
+        <Icon size={20} color={C.warning} />
+      </View>
+      <View style={{ flex: 1 }}>
+        <Text style={{ ...T.labelLarge, marginBottom: 2 }}>{title}</Text>
+        <Text style={{ ...T.bodyMedium, fontSize: 14 }}>{body}</Text>
         {actionLabel && onAction && (
-          <button
-            onClick={onAction}
-            style={{
-              marginTop: 8,
-              background: 'none',
-              border: 'none',
-              color: C.primary,
-              fontWeight: 600,
-              fontSize: 14,
-              cursor: 'pointer',
-              padding: 0,
-            }}
-          >
-            {actionLabel} →
-          </button>
+          <TouchableOpacity onPress={onAction} style={{ marginTop: 8 }}>
+            <Text style={{ color: C.primary, fontWeight: '600', fontSize: 14 }}>{actionLabel} →</Text>
+          </TouchableOpacity>
         )}
-      </div>
-    </div>
+      </View>
+    </View>
   )
 }

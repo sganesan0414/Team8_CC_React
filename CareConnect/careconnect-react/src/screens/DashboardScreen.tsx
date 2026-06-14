@@ -1,6 +1,9 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Settings, LogOut } from 'lucide-react'
+import { View, Text, TouchableOpacity } from 'react-native'
+import { useNavigation } from '@react-navigation/native'
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { Settings, LogOut } from 'lucide-react-native'
 import { useAccountStore } from '../store/accountStore'
 import BottomNav from '../components/BottomNav'
 import ContextBar from '../components/ContextBar'
@@ -11,6 +14,10 @@ import AppointmentsTab from '../tabs/AppointmentsTab'
 import RemindersTab from '../tabs/RemindersTab'
 import CareTeamTab from '../tabs/CareTeamTab'
 import { C } from '../theme/styles'
+import type { RootStackParamList } from '../App'
+import { ScrollView } from 'react-native'
+
+type Nav = NativeStackNavigationProp<RootStackParamList>
 
 const titles = ['CareConnect', 'My Medications', 'Appointments', 'Reminders', 'Care Team']
 const contextLabels = [
@@ -22,58 +29,50 @@ const contextLabels = [
 ]
 
 export default function DashboardScreen() {
-  const navigate = useNavigate()
+  const navigation = useNavigation<Nav>()
+  const insets = useSafeAreaInsets()
   const { signOut } = useAccountStore()
   const [navIndex, setNavIndex] = useState(0)
-
-  const handleSignOut = () => {
-    signOut()
-    navigate('/login', { replace: true })
-  }
 
   const tabs = [HomeTab, MedicationsTab, AppointmentsTab, RemindersTab, CareTeamTab]
   const ActiveTab = tabs[navIndex]
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', background: C.background }}>
-      {/* App Bar */}
-      <header style={{
-        background: C.primary,
-        color: C.textOnPrimary,
-        padding: '0 16px',
-        height: 56,
-        display: 'flex',
+    <View style={{ flex: 1, backgroundColor: C.background }}>
+      {/* Header */}
+      <View style={{
+        backgroundColor: C.primary,
+        paddingTop: insets.top,
+        height: 56 + insets.top,
+        paddingHorizontal: 16,
+        flexDirection: 'row',
         alignItems: 'center',
         gap: 8,
-        flexShrink: 0,
       }}>
-        <span style={{ flex: 1, fontSize: 20, fontWeight: 700 }}>{titles[navIndex]}</span>
-        <button
-          aria-label="Open settings"
-          onClick={() => navigate('/settings')}
-          style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: 8 }}
+        <Text style={{ flex: 1, fontSize: 20, fontWeight: '700', color: 'white' }}>{titles[navIndex]}</Text>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('Settings')}
+          style={{ padding: 8 }}
         >
-          <Settings size={22} />
-        </button>
-        <button
-          aria-label="Sign out"
-          onClick={handleSignOut}
-          style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, padding: '8px 4px', fontSize: 14 }}
+          <Settings size={22} color="white" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => signOut()}
+          style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 8, paddingHorizontal: 4 }}
         >
-          <LogOut size={18} />
-          <span>Sign out</span>
-        </button>
-      </header>
+          <LogOut size={18} color="white" />
+          <Text style={{ color: 'white', fontSize: 14 }}>Sign out</Text>
+        </TouchableOpacity>
+      </View>
 
       <ContextBar label={contextLabels[navIndex]} />
 
-      {/* Tab Content */}
-      <div style={{ flex: 1, overflowY: 'auto', background: C.background }}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
         <ActiveTab onNavChange={setNavIndex} />
-      </div>
+      </ScrollView>
 
       <BottomNav currentIndex={navIndex} onTap={setNavIndex} />
       <ToastContainer />
-    </div>
+    </View>
   )
 }

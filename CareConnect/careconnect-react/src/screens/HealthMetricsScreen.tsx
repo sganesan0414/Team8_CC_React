@@ -1,14 +1,20 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Save, Activity } from 'lucide-react'
+import { View, Text, TextInput, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native'
+import { useNavigation } from '@react-navigation/native'
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { Save } from 'lucide-react-native'
 import { useHealthMetricsStore } from '../store/healthMetricsStore'
 import AppBar from '../components/AppBar'
 import ContextBar from '../components/ContextBar'
+import Select from '../components/Select'
 import type { HealthMetric, MetricStatus } from '../types'
 import { C, T, inputBase, btnPrimary } from '../theme/styles'
+import type { RootStackParamList } from '../App'
+
+type Nav = NativeStackNavigationProp<RootStackParamList>
 
 export default function HealthMetricsScreen() {
-  const navigate = useNavigate()
+  const navigation = useNavigation<Nav>()
   const { metrics, isAddingReading, addReading } = useHealthMetricsStore()
   const [selectedMetricId, setSelectedMetricId] = useState('')
   const [inputValue, setInputValue] = useState('')
@@ -22,71 +28,60 @@ export default function HealthMetricsScreen() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', background: C.background }}>
-      <AppBar title="Health Metrics" onBack={() => navigate(-1)} backLabel="Home" />
+    <View style={{ flex: 1, backgroundColor: C.background }}>
+      <AppBar title="Health Metrics" onBack={() => navigation.goBack()} backLabel="Home" />
       <ContextBar label="Home › Health Metrics" />
 
-      <div style={{ flex: 1, overflowY: 'auto', padding: 20 }}>
-        {/* Vitals Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 24 }}>
-          {metrics.map(m => <VitalCard key={m.id} metric={m} />)}
-        </div>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20 }}>
 
-        {/* Add Reading */}
-        <h2 style={{ ...T.headlineMedium, marginBottom: 12 }}>Add Reading</h2>
+        {/* Vitals Grid - 2 column */}
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 24 }}>
+          {metrics.map(m => (
+            <View key={m.id} style={{ width: '48%' }}>
+              <VitalCard metric={m} />
+            </View>
+          ))}
+        </View>
 
-        <div style={{ position: 'relative', marginBottom: 12 }}>
-          <Activity size={18} color={C.textMuted} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
-          <select
-            value={selectedMetricId}
-            onChange={e => setSelectedMetricId(e.target.value)}
-            style={{ ...inputBase, paddingLeft: 44, appearance: 'none' }}
-          >
-            <option value="">Select metric…</option>
-            {metrics.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-          </select>
-        </div>
+        <Text style={{ ...T.headlineMedium, marginBottom: 12 }}>Add Reading</Text>
 
-        <input
-          type="number"
+        <Select
+          value={selectedMetricId}
+          options={metrics.map(m => ({ label: m.name, value: m.id }))}
+          onChange={setSelectedMetricId}
+          placeholder="Select metric…"
+          style={{ marginBottom: 12 }}
+        />
+
+        <TextInput
           value={inputValue}
-          onChange={e => setInputValue(e.target.value)}
+          onChangeText={setInputValue}
           placeholder="Enter reading value"
+          keyboardType="numeric"
           style={{ ...inputBase, marginBottom: 12 }}
         />
 
-        <button
-          onClick={handleSave}
+        <TouchableOpacity
+          onPress={handleSave}
           disabled={isAddingReading || !selectedMetricId || !inputValue}
-          aria-label="Save reading"
           style={{ ...btnPrimary, opacity: (isAddingReading || !selectedMetricId || !inputValue) ? 0.6 : 1, marginBottom: 28 }}
         >
           {isAddingReading
-            ? <><span style={spinnerStyle} /><span>Saving…</span></>
-            : <><Save size={18} /><span>Save Reading</span></>
+            ? <><ActivityIndicator size="small" color="white" /><Text style={{ color: 'white', fontSize: 16, fontWeight: '600' }}>Saving…</Text></>
+            : <><Save size={18} color="white" /><Text style={{ color: 'white', fontSize: 16, fontWeight: '600' }}>Save Reading</Text></>
           }
-        </button>
+        </TouchableOpacity>
 
-        {/* Recent Readings */}
-        <h2 style={{ ...T.headlineMedium, marginBottom: 12 }}>Recent Readings</h2>
+        <Text style={{ ...T.headlineMedium, marginBottom: 12 }}>Recent Readings</Text>
         {metrics.flatMap(m =>
           [...m.history].reverse().slice(0, 3).map((r, i) => (
             <ReadingRow key={`${m.id}-${i}`} metricName={m.name} unit={m.unit} reading={r} />
           ))
         )}
-      </div>
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-    </div>
-  )
-}
 
-const spinnerStyle: React.CSSProperties = {
-  width: 18, height: 18,
-  border: '2px solid white',
-  borderTopColor: 'transparent',
-  borderRadius: '50%',
-  animation: 'spin 0.8s linear infinite',
-  display: 'inline-block',
+      </ScrollView>
+    </View>
+  )
 }
 
 function statusColor(status: MetricStatus) {
@@ -102,34 +97,29 @@ function VitalCard({ metric }: { metric: HealthMetric }) {
   const maxV = Math.max(...values)
 
   return (
-    <div style={{ background: C.surface, borderRadius: 16, border: `1px solid ${C.border}`, padding: 14 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-        <span style={{ ...T.labelMedium, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{metric.name}</span>
-        <span style={{
-          background: sc + '18', border: `1px solid ${sc}`,
-          color: sc, borderRadius: 10, fontSize: 11, fontWeight: 700, padding: '2px 6px', marginLeft: 4, flexShrink: 0,
-        }}>{label}</span>
-      </div>
-      <p style={{ ...T.headlineMedium, marginBottom: 2 }}>{metric.displayValue}</p>
-      <p style={{ ...T.caption, marginBottom: 8 }}>{metric.unit}</p>
+    <View style={{ backgroundColor: C.surface, borderRadius: 16, borderWidth: 1, borderColor: C.border, padding: 14 }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+        <Text numberOfLines={1} style={{ ...T.labelMedium, flex: 1 }}>{metric.name}</Text>
+        <View style={{ backgroundColor: sc + '18', borderWidth: 1, borderColor: sc, borderRadius: 10, paddingVertical: 2, paddingHorizontal: 6, marginLeft: 4, flexShrink: 0 }}>
+          <Text style={{ fontSize: 11, fontWeight: '700', color: sc }}>{label}</Text>
+        </View>
+      </View>
+      <Text style={{ ...T.headlineMedium, marginBottom: 2 }}>{metric.displayValue}</Text>
+      <Text style={{ ...T.caption, marginBottom: 8 }}>{metric.unit}</Text>
 
-      {/* Mini sparkline */}
       {values.length > 0 && (
-        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 20 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 3, height: 20 }}>
           {history.map((r, i) => {
             const range = maxV - minV
             const norm = range === 0 ? 0.5 : (r.value - minV) / range
             const h = 4 + norm * 14
             return (
-              <div key={i} style={{
-                flex: 1, height: h, borderRadius: 2,
-                background: C.primary, opacity: 0.4 + norm * 0.6,
-              }} />
+              <View key={i} style={{ flex: 1, height: h, borderRadius: 2, backgroundColor: C.primary, opacity: 0.4 + norm * 0.6 }} />
             )
           })}
-        </div>
+        </View>
       )}
-    </div>
+    </View>
   )
 }
 
@@ -139,13 +129,10 @@ function ReadingRow({ metricName, unit, reading }: { metricName: string; unit: s
   const valueStr = reading.secondaryValue ? `${reading.value}/${reading.secondaryValue}` : String(reading.value)
 
   return (
-    <div style={{
-      background: C.surface, borderRadius: 12, border: `1px solid ${C.border}`,
-      padding: '12px 16px', display: 'flex', alignItems: 'center', marginBottom: 8,
-    }}>
-      <span style={{ ...T.labelMedium, flex: 1 }}>{metricName}</span>
-      <span style={{ ...T.labelLarge, marginRight: 12 }}>{valueStr} {unit}</span>
-      <span style={{ ...T.caption }}>{dateStr}</span>
-    </div>
+    <View style={{ backgroundColor: C.surface, borderRadius: 12, borderWidth: 1, borderColor: C.border, paddingVertical: 12, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+      <Text style={{ ...T.labelMedium, flex: 1 }}>{metricName}</Text>
+      <Text style={{ ...T.labelLarge, marginRight: 12 }}>{valueStr} {unit}</Text>
+      <Text style={{ ...T.caption }}>{dateStr}</Text>
+    </View>
   )
 }

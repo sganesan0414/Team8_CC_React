@@ -1,12 +1,12 @@
 import { useState } from 'react'
-import { Calendar, MapPin, CheckCircle, Clock, User, X, Edit2, Plus } from 'lucide-react'
+import { View, Text, TextInput, TouchableOpacity, Modal, ScrollView, Dimensions } from 'react-native'
+import { Calendar, MapPin, CheckCircle, Clock, User, X, Edit2, Plus } from 'lucide-react-native'
 import { useAppointmentsStore } from '../store/appointmentsStore'
 import StatCard from '../components/StatCard'
 import AlertBanner from '../components/AlertBanner'
 import type { Appointment, AppointmentStatus } from '../types'
 import { C, T } from '../theme/styles'
 
-const MONTHS = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 const FULL_MONTHS = ['','January','February','March','April','May','June','July','August','September','October','November','December']
 
 function formatTime(dt: Date) {
@@ -49,16 +49,16 @@ export default function AppointmentsTab({ onNavChange: _ }: Props) {
   }
 
   return (
-    <div style={{ padding: 20 }}>
+    <View style={{ padding: 20 }}>
       {/* Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 16 }}>
-        <StatCard icon={Calendar}     iconColor={C.primary}  value={String(appointments.length)} label="Total" />
-        <StatCard icon={Clock}        iconColor={C.warning}  value={String(upcoming.length)}     label="Upcoming" />
-        <StatCard icon={CheckCircle}  iconColor={C.success}  value={String(completed.length)}    label="Completed" />
-      </div>
+      <View style={{ flexDirection: 'row', gap: 12, marginBottom: 16 }}>
+        <View style={{ flex: 1 }}><StatCard icon={Calendar}    iconColor={C.primary} value={String(appointments.length)} label="Total" /></View>
+        <View style={{ flex: 1 }}><StatCard icon={Clock}       iconColor={C.warning} value={String(upcoming.length)} label="Upcoming" /></View>
+        <View style={{ flex: 1 }}><StatCard icon={CheckCircle} iconColor={C.success} value={String(completed.length)} label="Completed" /></View>
+      </View>
 
       {soonAppts.length > 0 && (
-        <div style={{ marginBottom: 16 }}>
+        <View style={{ marginBottom: 16 }}>
           <AlertBanner
             icon={Calendar}
             title="Appointment Soon"
@@ -66,56 +66,78 @@ export default function AppointmentsTab({ onNavChange: _ }: Props) {
             actionLabel="View Details"
             onAction={() => setSelectedAppt(soonAppts[0])}
           />
-        </div>
+        </View>
       )}
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-        <h2 style={{ ...T.headlineMedium }}>Your Appointments</h2>
-        <button onClick={() => setShowAddForm(!showAddForm)} style={{ background: C.primary, border: 'none', color: 'white', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, fontSize: 14, fontWeight: 600 }}>
-          <Plus size={16} />Add
-        </button>
-      </div>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+        <Text style={{ ...T.headlineMedium }}>Your Appointments</Text>
+        <TouchableOpacity
+          onPress={() => setShowAddForm(!showAddForm)}
+          style={{ backgroundColor: C.primary, borderRadius: 8, paddingVertical: 6, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', gap: 4 }}
+        >
+          <Plus size={16} color="white" />
+          <Text style={{ color: 'white', fontSize: 14, fontWeight: '600' }}>Add</Text>
+        </TouchableOpacity>
+      </View>
 
-      {/* Add form */}
       {showAddForm && (
-        <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 16, padding: 16, marginBottom: 16 }}>
-          <h3 style={{ ...T.titleLarge, marginBottom: 12 }}>New Appointment</h3>
+        <View style={{ backgroundColor: C.surface, borderWidth: 1, borderColor: C.border, borderRadius: 16, padding: 16, marginBottom: 16 }}>
+          <Text style={{ ...T.titleLarge, marginBottom: 12 }}>New Appointment</Text>
           {[
-            { label: 'Doctor Name', value: newDoctor, setter: setNewDoctor, type: 'text', placeholder: 'Dr. Jane Smith' },
-            { label: 'Specialty',   value: newSpecialty, setter: setNewSpecialty, type: 'text', placeholder: 'Primary Care' },
-            { label: 'Date & Time', value: newDate, setter: setNewDate, type: 'datetime-local', placeholder: '' },
-            { label: 'Location',   value: newLocation, setter: setNewLocation, type: 'text', placeholder: 'City Medical Center' },
+            { label: 'Doctor Name', value: newDoctor,    setter: setNewDoctor,    placeholder: 'Dr. Jane Smith',      keyboard: 'default' as const },
+            { label: 'Specialty',   value: newSpecialty, setter: setNewSpecialty, placeholder: 'Primary Care',        keyboard: 'default' as const },
+            { label: 'Date & Time', value: newDate,      setter: setNewDate,      placeholder: 'YYYY-MM-DDTHH:MM',    keyboard: 'numbers-and-punctuation' as const },
+            { label: 'Location',    value: newLocation,  setter: setNewLocation,  placeholder: 'City Medical Center', keyboard: 'default' as const },
           ].map(f => (
-            <label key={f.label} style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 10 }}>
-              <span style={{ ...T.labelMedium }}>{f.label}</span>
-              <input type={f.type} value={f.value} onChange={e => f.setter(e.target.value)} placeholder={f.placeholder}
-                style={{ padding: '10px 14px', borderRadius: 10, border: `1.5px solid ${C.border}`, background: C.surfaceVariant, fontSize: 15, outline: 'none' }} />
-            </label>
+            <View key={f.label} style={{ gap: 4, marginBottom: 10 }}>
+              <Text style={{ ...T.labelMedium }}>{f.label}</Text>
+              <TextInput
+                value={f.value}
+                onChangeText={f.setter}
+                placeholder={f.placeholder}
+                keyboardType={f.keyboard}
+                style={{ paddingVertical: 10, paddingHorizontal: 14, borderRadius: 10, borderWidth: 1.5, borderColor: C.border, backgroundColor: C.surfaceVariant, fontSize: 15 }}
+              />
+            </View>
           ))}
-          <div style={{ display: 'flex', gap: 10 }}>
-            <button onClick={handleAdd} disabled={!newDoctor || !newDate} style={{ flex: 1, padding: '12px 0', borderRadius: 10, background: C.primary, color: 'white', border: 'none', fontWeight: 600, cursor: 'pointer', opacity: (!newDoctor || !newDate) ? 0.5 : 1 }}>Add Appointment</button>
-            <button onClick={() => setShowAddForm(false)} style={{ flex: 1, padding: '12px 0', borderRadius: 10, border: `1.5px solid ${C.border}`, background: 'transparent', cursor: 'pointer', fontWeight: 600 }}>Cancel</button>
-          </div>
-        </div>
+          <View style={{ flexDirection: 'row', gap: 10 }}>
+            <TouchableOpacity
+              onPress={handleAdd}
+              disabled={!newDoctor || !newDate}
+              style={{ flex: 1, paddingVertical: 12, borderRadius: 10, backgroundColor: C.primary, alignItems: 'center', opacity: (!newDoctor || !newDate) ? 0.5 : 1 }}
+            >
+              <Text style={{ color: 'white', fontWeight: '600' }}>Add Appointment</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setShowAddForm(false)}
+              style={{ flex: 1, paddingVertical: 12, borderRadius: 10, borderWidth: 1.5, borderColor: C.border, backgroundColor: 'transparent', alignItems: 'center' }}
+            >
+              <Text style={{ fontWeight: '600', color: C.textPrimary }}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       )}
 
       {appointments.map(appt => (
         <ApptTile key={appt.id} appointment={appt} onTap={() => setSelectedAppt(appt)} />
       ))}
 
-      {/* Detail modal */}
       {selectedAppt && (
-        <DetailModal appt={selectedAppt} onClose={() => setSelectedAppt(null)} onCancel={() => { cancelAppointment(selectedAppt.id); setSelectedAppt(null) }} />
+        <DetailModal
+          appt={selectedAppt}
+          onClose={() => setSelectedAppt(null)}
+          onCancel={() => { cancelAppointment(selectedAppt.id); setSelectedAppt(null) }}
+        />
       )}
-    </div>
+    </View>
   )
 }
 
 function statusStyle(status: AppointmentStatus) {
   const map = {
-    upcoming:  { border: C.primary, bg: C.infoBg,       badge: C.primary,  label: 'Upcoming' },
-    completed: { border: C.success, bg: C.successBg,    badge: C.success,  label: 'Done' },
-    cancelled: { border: C.border,  bg: C.surfaceVariant, badge: C.textMuted, label: 'Cancelled' },
+    upcoming:  { border: C.primary,   bg: C.infoBg,         badge: C.primary,  label: 'Upcoming' },
+    completed: { border: C.success,   bg: C.successBg,      badge: C.success,  label: 'Done' },
+    cancelled: { border: C.border,    bg: C.surfaceVariant,  badge: C.textMuted, label: 'Cancelled' },
   }
   return map[status]
 }
@@ -127,79 +149,84 @@ function ApptTile({ appointment: a, onTap }: { appointment: Appointment; onTap: 
   const timeStr = formatTime(dt)
 
   return (
-    <button
-      onClick={onTap}
-      aria-label={`${a.doctorName}, ${a.specialty}, ${dateStr} at ${timeStr}`}
-      style={{ width: '100%', background: st.bg, border: `1.5px solid ${st.border}`, borderRadius: 16, padding: 16, marginBottom: 12, cursor: 'pointer', textAlign: 'left', display: 'block' }}
+    <TouchableOpacity
+      onPress={onTap}
+      style={{ width: '100%', backgroundColor: st.bg, borderWidth: 1.5, borderColor: st.border, borderRadius: 16, padding: 16, marginBottom: 12 }}
     >
-      <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-        <div style={{ width: 44, height: 44, borderRadius: '50%', background: st.border + '20', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+      <View style={{ flexDirection: 'row', gap: 14, alignItems: 'flex-start' }}>
+        <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: st.border + '20', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
           <User size={22} color={st.border} />
-        </div>
-        <div style={{ flex: 1 }}>
-          <p style={{ ...T.labelLarge }}>{a.doctorName}</p>
-          <p style={{ ...T.bodyMedium }}>{a.specialty}</p>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4 }}>
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={{ ...T.labelLarge }}>{a.doctorName}</Text>
+          <Text style={{ ...T.bodyMedium }}>{a.specialty}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 }}>
             <Calendar size={13} color={C.textMuted} />
-            <span style={{ ...T.caption }}>{dateStr}  {timeStr}</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <Text style={{ ...T.caption }}>{dateStr}  {timeStr}</Text>
+          </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
             <MapPin size={13} color={C.textMuted} />
-            <span style={{ ...T.caption, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 180 }}>{a.location}</span>
-          </div>
-        </div>
-        <span style={{ background: st.badge + '18', border: `1px solid ${st.badge}`, color: st.badge, borderRadius: 20, padding: '3px 8px', fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
-          {st.label}
-        </span>
-      </div>
-    </button>
+            <Text numberOfLines={1} style={{ ...T.caption, maxWidth: 180 }}>{a.location}</Text>
+          </View>
+        </View>
+        <View style={{ backgroundColor: st.badge + '18', borderWidth: 1, borderColor: st.badge, borderRadius: 20, paddingVertical: 3, paddingHorizontal: 8, flexShrink: 0 }}>
+          <Text style={{ fontSize: 12, fontWeight: '700', color: st.badge }}>{st.label}</Text>
+        </View>
+      </View>
+    </TouchableOpacity>
   )
 }
 
 function DetailModal({ appt: a, onClose, onCancel }: { appt: Appointment; onClose: () => void; onCancel: () => void }) {
   const dt = a.dateTime
   const dateStr = `${FULL_MONTHS[dt.getMonth() + 1]} ${dt.getDate()}, ${dt.getFullYear()}`
+  const screenHeight = Dimensions.get('window').height
 
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
-      <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)' }} />
-      <div style={{ position: 'relative', background: C.surface, borderRadius: '20px 20px 0 0', padding: '24px 24px 32px', maxHeight: '85vh', overflowY: 'auto' }}>
-        <div style={{ width: 40, height: 4, background: C.border, borderRadius: 2, margin: '0 auto 20px' }} />
-        <button onClick={onClose} style={{ position: 'absolute', top: 20, right: 20, background: 'none', border: 'none', cursor: 'pointer', color: C.textMuted }}>
-          <X size={22} />
-        </button>
+    <Modal visible transparent animationType="slide" onRequestClose={onClose}>
+      <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+        <TouchableOpacity style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)' }} onPress={onClose} activeOpacity={1} />
+        <View style={{ backgroundColor: C.surface, borderRadius: 20, padding: 24, paddingBottom: 32, maxHeight: screenHeight * 0.85 }}>
+          <View style={{ width: 40, height: 4, backgroundColor: C.border, borderRadius: 2, alignSelf: 'center', marginBottom: 20 }} />
+          <TouchableOpacity onPress={onClose} style={{ position: 'absolute', top: 20, right: 20 }}>
+            <X size={22} color={C.textMuted} />
+          </TouchableOpacity>
 
-        <h2 style={{ ...T.headlineMedium, marginBottom: 4 }}>{a.doctorName}</h2>
-        <p style={{ ...T.bodyMedium, marginBottom: 16 }}>{a.specialty}</p>
+          <Text style={{ ...T.headlineMedium, marginBottom: 4 }}>{a.doctorName}</Text>
+          <Text style={{ ...T.bodyMedium, marginBottom: 16 }}>{a.specialty}</Text>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-          <Calendar size={16} color={C.textMuted} />
-          <span style={{ ...T.bodyMedium }}>{dateStr} at {formatTime(dt)}</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-          <MapPin size={16} color={C.textMuted} />
-          <span style={{ ...T.bodyMedium }}>{a.location}</span>
-        </div>
-        {a.notes && (
-          <>
-            <p style={{ ...T.labelLarge, marginBottom: 4 }}>Notes</p>
-            <p style={{ ...T.bodyMedium, marginBottom: 16 }}>{a.notes}</p>
-          </>
-        )}
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+            <Calendar size={16} color={C.textMuted} />
+            <Text style={{ ...T.bodyMedium }}>{dateStr} at {formatTime(dt)}</Text>
+          </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+            <MapPin size={16} color={C.textMuted} />
+            <Text style={{ ...T.bodyMedium }}>{a.location}</Text>
+          </View>
+          {a.notes ? (
+            <>
+              <Text style={{ ...T.labelLarge, marginBottom: 4 }}>Notes</Text>
+              <Text style={{ ...T.bodyMedium, marginBottom: 16 }}>{a.notes}</Text>
+            </>
+          ) : null}
 
-        {a.status === 'upcoming' && (
-          <>
-            <button style={{ width: '100%', padding: '14px 0', borderRadius: 12, border: `1.5px solid ${C.border}`, background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, fontWeight: 600, fontSize: 15, marginBottom: 10 }}>
-              <Edit2 size={16} />Reschedule
-            </button>
-            <button
-              onClick={onCancel}
-              style={{ width: '100%', padding: '14px 0', borderRadius: 12, border: `1.5px solid ${C.red}`, background: C.redBg, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, fontWeight: 600, fontSize: 15, color: C.red }}>
-              <X size={16} />Cancel Appointment
-            </button>
-          </>
-        )}
-      </div>
-    </div>
+          {a.status === 'upcoming' && (
+            <>
+              <TouchableOpacity style={{ width: '100%', paddingVertical: 14, borderRadius: 12, borderWidth: 1.5, borderColor: C.border, backgroundColor: 'transparent', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 10 }}>
+                <Edit2 size={16} color={C.textPrimary} />
+                <Text style={{ color: C.textPrimary, fontWeight: '600', fontSize: 15 }}>Reschedule</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={onCancel}
+                style={{ width: '100%', paddingVertical: 14, borderRadius: 12, borderWidth: 1.5, borderColor: C.red, backgroundColor: C.redBg, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+              >
+                <X size={16} color={C.red} />
+                <Text style={{ color: C.red, fontWeight: '600', fontSize: 15 }}>Cancel Appointment</Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
+      </View>
+    </Modal>
   )
 }

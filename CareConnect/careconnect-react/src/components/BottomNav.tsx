@@ -1,4 +1,6 @@
-import { Home, Pill, Calendar, Bell, Users } from 'lucide-react'
+import { View, Text, TouchableOpacity } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { Home, Pill, Calendar, Bell, Users } from 'lucide-react-native'
 import { C } from '../theme/styles'
 
 const tabs = [
@@ -15,42 +17,38 @@ interface Props {
 }
 
 export default function BottomNav({ currentIndex, onTap }: Props) {
+  const insets = useSafeAreaInsets()
+
   return (
-    <nav style={{
-      display: 'flex',
-      background: C.surface,
-      borderTop: `1px solid ${C.border}`,
-      paddingBottom: 'env(safe-area-inset-bottom, 0)',
+    <View style={{
+      flexDirection: 'row',
+      backgroundColor: C.surface,
+      borderTopWidth: 1,
+      borderTopColor: C.border,
+      paddingBottom: insets.bottom,
       flexShrink: 0,
     }}>
       {tabs.map((tab, i) => {
         const active = i === currentIndex
         const Icon = tab.icon
         return (
-          <button
+          <TouchableOpacity
             key={i}
-            aria-label={tab.label}
-            aria-current={active ? 'page' : undefined}
-            onClick={() => onTap(i)}
+            onPress={() => onTap(i)}
             style={{
               flex: 1,
-              display: 'flex',
-              flexDirection: 'column',
               alignItems: 'center',
               gap: 4,
-              padding: '10px 0',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              color: active ? C.primary : C.textMuted,
-              transition: 'color 0.15s',
+              paddingVertical: 10,
             }}
           >
-            <Icon size={22} strokeWidth={active ? 2.5 : 1.75} />
-            <span style={{ fontSize: 11, fontWeight: active ? 600 : 400 }}>{tab.label}</span>
-          </button>
+            <Icon size={22} strokeWidth={active ? 2.5 : 1.75} color={active ? C.primary : C.textMuted} />
+            <Text style={{ fontSize: 11, fontWeight: active ? '600' : '400', color: active ? C.primary : C.textMuted }}>
+              {tab.label}
+            </Text>
+          </TouchableOpacity>
         )
       })}
-    </nav>
+    </View>
   )
 }

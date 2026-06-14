@@ -1,6 +1,8 @@
 import { useState } from 'react'
-import { Bell, BellOff, Trash2, Plus, Clock, RefreshCw } from 'lucide-react'
+import { View, Text, TextInput, TouchableOpacity } from 'react-native'
+import { Bell, BellOff, Trash2, Plus, Clock, RefreshCw } from 'lucide-react-native'
 import { useRemindersStore } from '../store/remindersStore'
+import Select from '../components/Select'
 import type { Reminder } from '../types'
 import { C, T, inputBase } from '../theme/styles'
 
@@ -28,72 +30,98 @@ export default function RemindersTab({ onNavChange: _ }: Props) {
     setTitle(''); setDescription(''); setTime('08:00'); setFrequency('daily')
   }
 
+  const freqOptions = [
+    { label: 'Daily',   value: 'daily' },
+    { label: 'Weekly',  value: 'weekly' },
+    { label: 'Monthly', value: 'monthly' },
+  ]
+
   return (
-    <div style={{ padding: 20 }}>
+    <View style={{ padding: 20 }}>
       {/* Summary */}
-      <div style={{ background: C.primary, borderRadius: 16, padding: 20, marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          <p style={{ ...T.titleLarge, color: 'white' }}>{enabledCount} Active Reminders</p>
-          <p style={{ ...T.bodyMedium, color: 'rgba(255,255,255,0.75)' }}>{reminders.length - enabledCount} paused</p>
-        </div>
-        <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <View style={{ backgroundColor: C.primary, borderRadius: 16, padding: 20, marginBottom: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+        <View>
+          <Text style={{ ...T.titleLarge, color: 'white' }}>{enabledCount} Active Reminders</Text>
+          <Text style={{ ...T.bodyMedium, color: 'rgba(255,255,255,0.75)' }}>{reminders.length - enabledCount} paused</Text>
+        </View>
+        <View style={{ width: 52, height: 52, borderRadius: 26, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' }}>
           <Bell size={28} color="white" />
-        </div>
-      </div>
+        </View>
+      </View>
 
-      {/* Add button */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <h2 style={{ ...T.headlineMedium }}>My Reminders</h2>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          style={{ background: C.primary, border: 'none', color: 'white', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, fontSize: 14, fontWeight: 600 }}
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <Text style={{ ...T.headlineMedium }}>My Reminders</Text>
+        <TouchableOpacity
+          onPress={() => setShowForm(!showForm)}
+          style={{ backgroundColor: C.primary, borderRadius: 8, paddingVertical: 6, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', gap: 4 }}
         >
-          <Plus size={16} /> Add
-        </button>
-      </div>
+          <Plus size={16} color="white" />
+          <Text style={{ color: 'white', fontSize: 14, fontWeight: '600' }}>Add</Text>
+        </TouchableOpacity>
+      </View>
 
-      {/* Add form */}
       {showForm && (
-        <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 16, padding: 16, marginBottom: 20 }}>
-          <h3 style={{ ...T.titleLarge, marginBottom: 12 }}>New Reminder</h3>
-          <label style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 10 }}>
-            <span style={{ ...T.labelMedium }}>Title *</span>
-            <input type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="e.g. Take evening medication" style={{ ...inputBase }} />
-          </label>
-          <label style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 10 }}>
-            <span style={{ ...T.labelMedium }}>Description</span>
-            <input type="text" value={description} onChange={e => setDescription(e.target.value)} placeholder="Optional details" style={{ ...inputBase }} />
-          </label>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
-            <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <span style={{ ...T.labelMedium }}>Time</span>
-              <input type="time" value={time} onChange={e => setTime(e.target.value)} style={{ ...inputBase }} />
-            </label>
-            <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <span style={{ ...T.labelMedium }}>Frequency</span>
-              <select value={frequency} onChange={e => setFrequency(e.target.value as Reminder['frequency'])} style={{ ...inputBase, appearance: 'none' }}>
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-                <option value="monthly">Monthly</option>
-              </select>
-            </label>
-          </div>
-          <div style={{ display: 'flex', gap: 10 }}>
-            <button onClick={handleAdd} disabled={!title} style={{ flex: 1, padding: '12px 0', borderRadius: 10, background: C.primary, color: 'white', border: 'none', fontWeight: 600, cursor: 'pointer', opacity: !title ? 0.5 : 1 }}>Add Reminder</button>
-            <button onClick={() => setShowForm(false)} style={{ flex: 1, padding: '12px 0', borderRadius: 10, border: `1.5px solid ${C.border}`, background: 'transparent', cursor: 'pointer', fontWeight: 600 }}>Cancel</button>
-          </div>
-        </div>
+        <View style={{ backgroundColor: C.surface, borderWidth: 1, borderColor: C.border, borderRadius: 16, padding: 16, marginBottom: 20 }}>
+          <Text style={{ ...T.titleLarge, marginBottom: 12 }}>New Reminder</Text>
+
+          <View style={{ gap: 4, marginBottom: 10 }}>
+            <Text style={{ ...T.labelMedium }}>Title *</Text>
+            <TextInput value={title} onChangeText={setTitle} placeholder="e.g. Take evening medication" style={{ ...inputBase }} />
+          </View>
+
+          <View style={{ gap: 4, marginBottom: 10 }}>
+            <Text style={{ ...T.labelMedium }}>Description</Text>
+            <TextInput value={description} onChangeText={setDescription} placeholder="Optional details" style={{ ...inputBase }} />
+          </View>
+
+          <View style={{ flexDirection: 'row', gap: 10, marginBottom: 14 }}>
+            <View style={{ flex: 1, gap: 4 }}>
+              <Text style={{ ...T.labelMedium }}>Time (HH:MM)</Text>
+              <TextInput
+                value={time}
+                onChangeText={setTime}
+                placeholder="08:00"
+                keyboardType="numbers-and-punctuation"
+                style={{ ...inputBase }}
+              />
+            </View>
+            <View style={{ flex: 1, gap: 4 }}>
+              <Text style={{ ...T.labelMedium }}>Frequency</Text>
+              <Select
+                value={frequency}
+                options={freqOptions}
+                onChange={v => setFrequency(v as Reminder['frequency'])}
+                placeholder="Frequency"
+              />
+            </View>
+          </View>
+
+          <View style={{ flexDirection: 'row', gap: 10 }}>
+            <TouchableOpacity
+              onPress={handleAdd}
+              disabled={!title}
+              style={{ flex: 1, paddingVertical: 12, borderRadius: 10, backgroundColor: C.primary, alignItems: 'center', opacity: !title ? 0.5 : 1 }}
+            >
+              <Text style={{ color: 'white', fontWeight: '600' }}>Add Reminder</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setShowForm(false)}
+              style={{ flex: 1, paddingVertical: 12, borderRadius: 10, borderWidth: 1.5, borderColor: C.border, backgroundColor: 'transparent', alignItems: 'center' }}
+            >
+              <Text style={{ fontWeight: '600', color: C.textPrimary }}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       )}
 
-      {/* Reminder cards */}
       {reminders.length === 0 ? (
-        <p style={{ ...T.bodyMedium, textAlign: 'center', padding: '40px 0' }}>No reminders yet. Add one above.</p>
+        <Text style={{ ...T.bodyMedium, textAlign: 'center', paddingVertical: 40 }}>No reminders yet. Add one above.</Text>
       ) : (
         reminders.map(r => (
           <ReminderCard key={r.id} reminder={r} onToggle={() => toggleReminder(r.id)} onRemove={() => removeReminder(r.id)} />
         ))
       )}
-    </div>
+    </View>
   )
 }
 
@@ -101,44 +129,42 @@ function ReminderCard({ reminder: r, onToggle, onRemove }: { reminder: Reminder;
   const freqLabel = r.frequency === 'daily' ? 'Daily' : r.frequency === 'weekly' ? 'Weekly' : 'Monthly'
 
   return (
-    <div style={{
-      background: r.enabled ? C.surface : C.surfaceVariant,
-      border: `1.5px solid ${r.enabled ? C.primary : C.border}`,
+    <View style={{
+      backgroundColor: r.enabled ? C.surface : C.surfaceVariant,
+      borderWidth: 1.5,
+      borderColor: r.enabled ? C.primary : C.border,
       borderRadius: 16, padding: 16, marginBottom: 12,
       opacity: r.enabled ? 1 : 0.75,
     }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-        <div style={{ flex: 1 }}>
-          <p style={{ ...T.labelLarge }}>{r.title}</p>
-          {r.description && <p style={{ ...T.bodyMedium, fontSize: 14 }}>{r.description}</p>}
-        </div>
-        <div style={{ display: 'flex', gap: 4 }}>
-          <button onClick={onToggle} title={r.enabled ? 'Pause reminder' : 'Enable reminder'} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, color: r.enabled ? C.primary : C.textMuted }}>
-            {r.enabled ? <Bell size={20} /> : <BellOff size={20} />}
-          </button>
-          <button onClick={onRemove} title="Delete reminder" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, color: C.red }}>
-            <Trash2 size={18} />
-          </button>
-        </div>
-      </div>
-      <div style={{ display: 'flex', gap: 14 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+        <View style={{ flex: 1 }}>
+          <Text style={{ ...T.labelLarge }}>{r.title}</Text>
+          {r.description ? <Text style={{ ...T.bodyMedium, fontSize: 14 }}>{r.description}</Text> : null}
+        </View>
+        <View style={{ flexDirection: 'row', gap: 4 }}>
+          <TouchableOpacity onPress={onToggle} style={{ padding: 6 }}>
+            {r.enabled ? <Bell size={20} color={C.primary} /> : <BellOff size={20} color={C.textMuted} />}
+          </TouchableOpacity>
+          <TouchableOpacity onPress={onRemove} style={{ padding: 6 }}>
+            <Trash2 size={18} color={C.red} />
+          </TouchableOpacity>
+        </View>
+      </View>
+      <View style={{ flexDirection: 'row', gap: 14 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
           <Clock size={14} color={C.textMuted} />
-          <span style={{ ...T.caption, fontWeight: 600 }}>{r.time}</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+          <Text style={{ ...T.caption, fontWeight: '600' }}>{r.time}</Text>
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
           <RefreshCw size={14} color={C.textMuted} />
-          <span style={{ ...T.caption }}>{freqLabel}</span>
-        </div>
-        <span style={{
-          background: r.enabled ? C.primaryLight : C.surfaceVariant,
-          border: `1px solid ${r.enabled ? C.primary : C.border}`,
-          color: r.enabled ? C.primary : C.textMuted,
-          borderRadius: 20, padding: '2px 8px', fontSize: 11, fontWeight: 700,
-        }}>
-          {r.enabled ? 'Active' : 'Paused'}
-        </span>
-      </div>
-    </div>
+          <Text style={{ ...T.caption }}>{freqLabel}</Text>
+        </View>
+        <View style={{ backgroundColor: r.enabled ? C.primaryLight : C.surfaceVariant, borderWidth: 1, borderColor: r.enabled ? C.primary : C.border, borderRadius: 20, paddingVertical: 2, paddingHorizontal: 8 }}>
+          <Text style={{ fontSize: 11, fontWeight: '700', color: r.enabled ? C.primary : C.textMuted }}>
+            {r.enabled ? 'Active' : 'Paused'}
+          </Text>
+        </View>
+      </View>
+    </View>
   )
 }

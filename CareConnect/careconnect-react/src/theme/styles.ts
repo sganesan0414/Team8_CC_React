@@ -1,5 +1,3 @@
-import type { CSSProperties } from 'react'
-
 export const C = {
   primary: '#1A3FB0',
   primaryLight: '#E8EEFF',
@@ -24,66 +22,59 @@ export const C = {
   purple: '#7B3FA0',
 } as const
 
-export const T: Record<string, CSSProperties> = {
-  displayLarge: { fontSize: 28, fontWeight: 700, color: C.textPrimary, lineHeight: 1.3, letterSpacing: -0.3 },
-  headlineMedium: { fontSize: 22, fontWeight: 700, color: C.textPrimary, lineHeight: 1.3 },
-  titleLarge: { fontSize: 18, fontWeight: 600, color: C.textPrimary, lineHeight: 1.4 },
-  bodyLarge: { fontSize: 17, fontWeight: 400, color: C.textPrimary, lineHeight: 1.5 },
-  bodyMedium: { fontSize: 15, fontWeight: 400, color: C.textSecondary, lineHeight: 1.5 },
-  labelLarge: { fontSize: 16, fontWeight: 600, color: C.textPrimary, lineHeight: 1.4 },
-  labelMedium: { fontSize: 14, fontWeight: 500, color: C.textSecondary, lineHeight: 1.4 },
-  caption: { fontSize: 13, fontWeight: 400, color: C.textMuted, lineHeight: 1.4 },
+export const T = {
+  displayLarge:   { fontSize: 28, fontWeight: '700' as const, color: C.textPrimary,   lineHeight: 36, letterSpacing: -0.3 },
+  headlineMedium: { fontSize: 22, fontWeight: '700' as const, color: C.textPrimary,   lineHeight: 29 },
+  titleLarge:     { fontSize: 18, fontWeight: '600' as const, color: C.textPrimary,   lineHeight: 25 },
+  bodyLarge:      { fontSize: 17, fontWeight: '400' as const, color: C.textPrimary,   lineHeight: 26 },
+  bodyMedium:     { fontSize: 15, fontWeight: '400' as const, color: C.textSecondary, lineHeight: 23 },
+  labelLarge:     { fontSize: 16, fontWeight: '600' as const, color: C.textPrimary,   lineHeight: 22 },
+  labelMedium:    { fontSize: 14, fontWeight: '500' as const, color: C.textSecondary, lineHeight: 20 },
+  caption:        { fontSize: 13, fontWeight: '400' as const, color: C.textMuted,     lineHeight: 18 },
 }
 
-export const card: CSSProperties = {
-  background: C.surface,
+export const card = {
+  backgroundColor: C.surface,
   borderRadius: 16,
-  border: `1px solid ${C.border}`,
+  borderWidth: 1,
+  borderColor: C.border,
   padding: 16,
 }
 
-export const inputBase: CSSProperties = {
-  width: '100%',
-  padding: '14px 16px',
+export const inputBase = {
+  width: '100%' as const,
+  paddingVertical: 14,
+  paddingHorizontal: 16,
   borderRadius: 12,
-  border: `1.5px solid ${C.border}`,
-  background: C.surfaceVariant,
+  borderWidth: 1.5,
+  borderColor: C.border,
+  backgroundColor: C.surfaceVariant,
   fontSize: 17,
   color: C.textPrimary,
-  outline: 'none',
-  transition: 'border-color 0.15s',
 }
 
-export const btnPrimary: CSSProperties = {
-  width: '100%',
-  padding: '16px 24px',
+export const btnPrimary = {
+  width: '100%' as const,
+  paddingVertical: 16,
+  paddingHorizontal: 24,
   borderRadius: 12,
-  background: C.primary,
-  color: C.textOnPrimary,
-  fontSize: 16,
-  fontWeight: 600,
-  cursor: 'pointer',
-  border: 'none',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
+  backgroundColor: C.primary,
+  flexDirection: 'row' as const,
+  alignItems: 'center' as const,
+  justifyContent: 'center' as const,
   gap: 8,
-  transition: 'opacity 0.15s',
 }
 
-export const btnOutlined: CSSProperties = {
-  width: '100%',
-  padding: '14px 24px',
+export const btnOutlined = {
+  width: '100%' as const,
+  paddingVertical: 14,
+  paddingHorizontal: 24,
   borderRadius: 12,
-  background: 'transparent',
-  color: C.textPrimary,
-  fontSize: 16,
-  fontWeight: 600,
-  cursor: 'pointer',
-  border: `1.5px solid ${C.border}`,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
+  backgroundColor: 'transparent' as const,
+  flexDirection: 'row' as const,
+  alignItems: 'center' as const,
+  justifyContent: 'center' as const,
   gap: 8,
-  transition: 'border-color 0.15s',
+  borderWidth: 1.5,
+  borderColor: C.border,
 }

@@ -1,13 +1,18 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { User, Mail, Phone, MapPin, Save, Camera } from 'lucide-react'
+import { View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native'
+import { useNavigation } from '@react-navigation/native'
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { User, Mail, Phone, MapPin, Save, Camera } from 'lucide-react-native'
 import { useAccountStore } from '../store/accountStore'
 import AppBar from '../components/AppBar'
 import ContextBar from '../components/ContextBar'
 import { C, T, inputBase, btnPrimary } from '../theme/styles'
+import type { RootStackParamList } from '../App'
+
+type Nav = NativeStackNavigationProp<RootStackParamList>
 
 export default function UserProfileScreen() {
-  const navigate = useNavigate()
+  const navigation = useNavigation<Nav>()
   const { displayName, email, avatarInitials, updateProfile } = useAccountStore()
 
   const [name, setName] = useState(displayName)
@@ -23,72 +28,79 @@ export default function UserProfileScreen() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', background: C.background }}>
-      <AppBar title="My Profile" onBack={() => navigate(-1)} />
+    <View style={{ flex: 1, backgroundColor: C.background }}>
+      <AppBar title="My Profile" onBack={() => navigation.goBack()} />
       <ContextBar label="Settings › My Profile" />
 
-      <div style={{ flex: 1, overflowY: 'auto', padding: 20 }}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20 }}>
+
         {/* Avatar */}
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 28 }}>
-          <div style={{ position: 'relative' }}>
-            <div style={{
-              width: 88, height: 88, borderRadius: '50%',
-              background: C.primary, display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 32, fontWeight: 700, color: 'white',
-            }}>
-              {avatarInitials || <User size={40} color="white" />}
-            </div>
-            <button style={{
+        <View style={{ alignItems: 'center', marginBottom: 28 }}>
+          <View style={{ position: 'relative' }}>
+            <View style={{ width: 88, height: 88, borderRadius: 44, backgroundColor: C.primary, alignItems: 'center', justifyContent: 'center' }}>
+              {avatarInitials
+                ? <Text style={{ fontSize: 32, fontWeight: '700', color: 'white' }}>{avatarInitials}</Text>
+                : <User size={40} color="white" />
+              }
+            </View>
+            <TouchableOpacity style={{
               position: 'absolute', bottom: 0, right: 0,
-              width: 28, height: 28, borderRadius: '50%',
-              background: C.accent, border: '2px solid white',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer',
+              width: 28, height: 28, borderRadius: 14,
+              backgroundColor: C.accent, borderWidth: 2, borderColor: 'white',
+              alignItems: 'center', justifyContent: 'center',
             }}>
               <Camera size={14} color="white" />
-            </button>
-          </div>
-        </div>
+            </TouchableOpacity>
+          </View>
+        </View>
 
-        {/* Form */}
-        <div style={{ background: C.surface, borderRadius: 16, border: `1px solid ${C.border}`, padding: 20, marginBottom: 20 }}>
-          <h2 style={{ ...T.titleLarge, marginBottom: 16 }}>Personal Information</h2>
+        <View style={{ backgroundColor: C.surface, borderRadius: 16, borderWidth: 1, borderColor: C.border, padding: 20, marginBottom: 20 }}>
+          <Text style={{ ...T.titleLarge, marginBottom: 16 }}>Personal Information</Text>
 
           {[
-            { icon: User,   label: 'Full Name',      value: name,    setter: setName,    type: 'text'  },
-            { icon: Mail,   label: 'Email',          value: email,   setter: () => {},   type: 'email', disabled: true },
-            { icon: Phone,  label: 'Phone',          value: phone,   setter: setPhone,   type: 'tel'   },
-            { icon: MapPin, label: 'Address',        value: address, setter: setAddress, type: 'text'  },
-          ].map(({ icon: Icon, label, value, setter, type, disabled }) => (
-            <label key={label} style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 14 }}>
-              <span style={{ ...T.labelMedium }}>{label}</span>
-              <div style={{ position: 'relative' }}>
-                <Icon size={18} color={C.textMuted} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
-                <input
-                  type={type}
+            { icon: User,   label: 'Full Name', value: name,    setter: setName,    keyboardType: 'default' as const, disabled: false },
+            { icon: Mail,   label: 'Email',     value: email,   setter: () => {},   keyboardType: 'email-address' as const, disabled: true },
+            { icon: Phone,  label: 'Phone',     value: phone,   setter: setPhone,   keyboardType: 'phone-pad' as const, disabled: false },
+            { icon: MapPin, label: 'Address',   value: address, setter: setAddress, keyboardType: 'default' as const, disabled: false },
+          ].map(({ icon: Icon, label, value, setter, keyboardType, disabled }) => (
+            <View key={label} style={{ gap: 6, marginBottom: 14 }}>
+              <Text style={{ ...T.labelMedium }}>{label}</Text>
+              <View style={{ position: 'relative' }}>
+                <View style={{ position: 'absolute', left: 14, top: 0, bottom: 0, justifyContent: 'center', zIndex: 1 }}>
+                  <Icon size={18} color={C.textMuted} />
+                </View>
+                <TextInput
                   value={value}
-                  onChange={e => (setter as (v: string) => void)(e.target.value)}
-                  disabled={disabled}
+                  onChangeText={v => (setter as (v: string) => void)(v)}
+                  keyboardType={keyboardType}
+                  editable={!disabled}
                   style={{ ...inputBase, paddingLeft: 44, opacity: disabled ? 0.6 : 1 }}
                 />
-              </div>
-            </label>
+              </View>
+            </View>
           ))}
 
-          <label style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 4 }}>
-            <span style={{ ...T.labelMedium }}>Date of Birth</span>
-            <input type="date" value={dob} onChange={e => setDob(e.target.value)} style={{ ...inputBase }} />
-          </label>
-        </div>
+          <View style={{ gap: 6 }}>
+            <Text style={{ ...T.labelMedium }}>Date of Birth</Text>
+            <TextInput
+              value={dob}
+              onChangeText={setDob}
+              placeholder="YYYY-MM-DD"
+              keyboardType="numbers-and-punctuation"
+              style={{ ...inputBase }}
+            />
+          </View>
+        </View>
 
-        <button
-          onClick={handleSave}
-          style={{ ...btnPrimary, background: saved ? C.success : C.primary }}
+        <TouchableOpacity
+          onPress={handleSave}
+          style={{ ...btnPrimary, backgroundColor: saved ? C.success : C.primary }}
         >
-          <Save size={18} />
-          <span>{saved ? 'Saved!' : 'Save Changes'}</span>
-        </button>
-      </div>
-    </div>
+          <Save size={18} color="white" />
+          <Text style={{ color: 'white', fontSize: 16, fontWeight: '600' }}>{saved ? 'Saved!' : 'Save Changes'}</Text>
+        </TouchableOpacity>
+
+      </ScrollView>
+    </View>
   )
 }

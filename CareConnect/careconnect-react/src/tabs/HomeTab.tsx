@@ -1,10 +1,15 @@
-import { useNavigate } from 'react-router-dom'
-import { Pill, Calendar, Heart, FileText, ShoppingBag, TrendingUp, AlertTriangle } from 'lucide-react'
+import { View, Text, TouchableOpacity } from 'react-native'
+import { useNavigation } from '@react-navigation/native'
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { Pill, Calendar, Heart, FileText, ShoppingBag, TrendingUp, AlertTriangle } from 'lucide-react-native'
 import { useAccountStore } from '../store/accountStore'
 import { useMedicationsStore } from '../store/medicationsStore'
 import { useAppointmentsStore } from '../store/appointmentsStore'
 import AlertBanner from '../components/AlertBanner'
 import { C, T } from '../theme/styles'
+import type { RootStackParamList } from '../App'
+
+type Nav = NativeStackNavigationProp<RootStackParamList>
 
 const DAYS   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December']
@@ -19,7 +24,7 @@ function formatTime(dt: Date) {
 interface Props { onNavChange: (i: number) => void }
 
 export default function HomeTab({ onNavChange }: Props) {
-  const navigate = useNavigate()
+  const navigation = useNavigation<Nav>()
   const { displayName } = useAccountStore()
   const { medications } = useMedicationsStore()
   const { appointments } = useAppointmentsStore()
@@ -33,129 +38,129 @@ export default function HomeTab({ onNavChange }: Props) {
   const unTakenMeds = medications.filter(m => !m.taken).slice(0, 3)
 
   const quickActions = [
-    { icon: Pill,       label: 'My\nMedications', color: C.primary,  onClick: () => onNavChange(1) },
-    { icon: Calendar,   label: 'Appointments',   color: C.purple,   onClick: () => onNavChange(2) },
-    { icon: Heart,      label: 'Health\nMetrics', color: '#B0193C',  onClick: () => navigate('/health-metrics') },
-    { icon: FileText,   label: 'Reports',        color: C.success,  onClick: () => navigate('/health-reports') },
-    { icon: ShoppingBag,label: 'Pharmacy',       color: '#816FC9',   onClick: () => navigate('/pharmacy') },
+    { icon: Pill,        label: 'My\nMedications', color: C.primary,  onPress: () => onNavChange(1) },
+    { icon: Calendar,   label: 'Appointments',    color: C.purple,   onPress: () => onNavChange(2) },
+    { icon: Heart,      label: 'Health\nMetrics', color: '#B0193C',  onPress: () => navigation.navigate('HealthMetrics') },
+    { icon: FileText,   label: 'Reports',         color: C.success,  onPress: () => navigation.navigate('HealthReports') },
+    { icon: ShoppingBag,label: 'Pharmacy',        color: '#816FC9',  onPress: () => navigation.navigate('Pharmacy') },
   ]
 
   return (
-    <div style={{ padding: 20 }}>
+    <View style={{ padding: 20 }}>
       {/* Hero banner */}
-      <div style={{ background: C.primary, borderRadius: 20, padding: 24, marginBottom: 24 }}>
-        <button
-          onClick={() => navigate('/profile')}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'block', textAlign: 'left', marginBottom: 4 }}
-          aria-label={`Open profile for ${name}`}
+      <View style={{ backgroundColor: C.primary, borderRadius: 20, padding: 24, marginBottom: 24 }}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('Profile')}
+          style={{ marginBottom: 4 }}
         >
-          <span style={{ ...T.displayLarge, color: 'white', display: 'block' }}>Good Morning, {name}</span>
-        </button>
-        <p style={{ ...T.bodyMedium, color: 'rgba(255,255,255,0.75)', marginBottom: 20 }}>{todayLabel}</p>
+          <Text style={{ ...T.displayLarge, color: 'white' }}>Good Morning, {name}</Text>
+        </TouchableOpacity>
+        <Text style={{ ...T.bodyMedium, color: 'rgba(255,255,255,0.75)', marginBottom: 20 }}>{todayLabel}</Text>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+        <View style={{ flexDirection: 'row', gap: 8 }}>
           {[
-            { icon: Pill,        value: `${takenCount}/${medications.length}`, label: 'Medications\nToday',   color: C.accent },
-            { icon: TrendingUp,  value: '94%',                                label: 'Adherence\nRate',       color: C.success },
-            { icon: Calendar,    value: nextAppt ? `${SHORT_MONTHS[nextAppt.dateTime.getMonth()]} ${nextAppt.dateTime.getDate()}` : 'None', label: 'Next\nAppointment', color: C.accent },
+            { icon: Pill,       value: `${takenCount}/${medications.length}`, label: 'Medications\nToday',    color: C.accent },
+            { icon: TrendingUp, value: '94%',                                  label: 'Adherence\nRate',       color: C.success },
+            { icon: Calendar,   value: nextAppt ? `${SHORT_MONTHS[nextAppt.dateTime.getMonth()]} ${nextAppt.dateTime.getDate()}` : 'None', label: 'Next\nAppointment', color: C.accent },
           ].map(({ icon: Icon, value, label, color }) => (
-            <div key={label} style={{ background: 'rgba(255,255,255,0.15)', borderRadius: 14, padding: 12 }}>
-              <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
+            <View key={label} style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 14, padding: 12 }}>
+              <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
                 <Icon size={14} color="white" />
-              </div>
-              <p style={{ fontSize: 18, fontWeight: 800, color: 'white', marginBottom: 2 }}>{value}</p>
-              <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)', whiteSpace: 'pre-line', lineHeight: 1.3 }}>{label}</p>
-            </div>
+              </View>
+              <Text style={{ fontSize: 18, fontWeight: '800', color: 'white', marginBottom: 2 }}>{value}</Text>
+              <Text style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)', lineHeight: 15 }}>{label}</Text>
+            </View>
           ))}
-        </div>
-      </div>
+        </View>
+      </View>
 
       {/* Quick Actions */}
-      <h2 style={{ ...T.headlineMedium, marginBottom: 14 }}>Quick Actions</h2>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 24 }}>
-        {quickActions.map(({ icon: Icon, label, color, onClick }) => (
-          <button
+      <Text style={{ ...T.headlineMedium, marginBottom: 14 }}>Quick Actions</Text>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 24 }}>
+        {quickActions.map(({ icon: Icon, label, color, onPress }) => (
+          <TouchableOpacity
             key={label}
-            onClick={onClick}
+            onPress={onPress}
             style={{
-              background: C.surface, border: `1px solid ${C.border}`, borderRadius: 16,
-              padding: '20px 16px', cursor: 'pointer', textAlign: 'left',
-              display: 'flex', flexDirection: 'column', gap: 10, aspectRatio: '1 / 0.9',
+              backgroundColor: C.surface, borderWidth: 1, borderColor: C.border,
+              borderRadius: 16, padding: 20, paddingHorizontal: 16,
+              width: '48%', gap: 10, minHeight: 90,
             }}
           >
-            <div style={{ width: 44, height: 44, borderRadius: 12, background: color + '18', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <View style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: color + '18', alignItems: 'center', justifyContent: 'center' }}>
               <Icon size={22} color={color} />
-            </div>
-            <span style={{ ...T.labelLarge, whiteSpace: 'pre-line', lineHeight: 1.3 }}>{label}</span>
-          </button>
+            </View>
+            <Text style={{ ...T.labelLarge }}>{label}</Text>
+          </TouchableOpacity>
         ))}
-      </div>
+      </View>
 
-      {/* Alert banner */}
+      {/* Alert */}
       <AlertBanner
         icon={AlertTriangle}
         title="Refill Reminder"
         body="Atorvastatin has only 2 refills remaining. Request a refill soon."
         actionLabel="Request Refill"
-        onAction={() => navigate('/pharmacy')}
+        onAction={() => navigation.navigate('Pharmacy')}
       />
 
-      <div style={{ marginTop: 24 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-          <h2 style={{ ...T.headlineMedium }}>Upcoming Medications</h2>
-          <button onClick={() => onNavChange(1)} style={{ background: 'none', border: 'none', color: C.primary, fontWeight: 600, cursor: 'pointer', fontSize: 14 }}>View All</button>
-        </div>
+      {/* Upcoming Medications */}
+      <View style={{ marginTop: 24 }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <Text style={{ ...T.headlineMedium }}>Upcoming Medications</Text>
+          <TouchableOpacity onPress={() => onNavChange(1)}>
+            <Text style={{ color: C.primary, fontWeight: '600', fontSize: 14 }}>View All</Text>
+          </TouchableOpacity>
+        </View>
 
         {unTakenMeds.length === 0
-          ? <p style={{ ...T.bodyMedium }}>All medications taken for today!</p>
+          ? <Text style={{ ...T.bodyMedium }}>All medications taken for today!</Text>
           : unTakenMeds.map(med => (
-            <div key={med.id} style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 14, padding: 16, display: 'flex', alignItems: 'center', gap: 14, marginBottom: 10 }}>
-              <div style={{ width: 40, height: 40, borderRadius: '50%', background: C.warningBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <View key={med.id} style={{ backgroundColor: C.surface, borderWidth: 1, borderColor: C.border, borderRadius: 14, padding: 16, flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 10 }}>
+              <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: C.warningBg, alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <Pill size={18} color={C.warning} />
-              </div>
-              <div style={{ flex: 1 }}>
-                <p style={{ ...T.labelLarge }}>{med.name}</p>
-                <p style={{ ...T.bodyMedium }}>{med.dose}</p>
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <p style={{ ...T.titleLarge, color: C.warning, fontSize: 16 }}>{med.times[0]}</p>
-                <p style={{ ...T.caption, color: C.warning }}>Due soon</p>
-              </div>
-            </div>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ ...T.labelLarge }}>{med.name}</Text>
+                <Text style={{ ...T.bodyMedium }}>{med.dose}</Text>
+              </View>
+              <View style={{ alignItems: 'flex-end' }}>
+                <Text style={{ ...T.titleLarge, color: C.warning, fontSize: 16 }}>{med.times[0]}</Text>
+                <Text style={{ ...T.caption, color: C.warning }}>Due soon</Text>
+              </View>
+            </View>
           ))
         }
-      </div>
+      </View>
 
       {/* Next Appointment */}
-      <div style={{ marginTop: 24, marginBottom: 32 }}>
-        <h2 style={{ ...T.headlineMedium, marginBottom: 12 }}>Next Appointment</h2>
+      <View style={{ marginTop: 24, marginBottom: 32 }}>
+        <Text style={{ ...T.headlineMedium, marginBottom: 12 }}>Next Appointment</Text>
         {nextAppt ? (
-          <div style={{ background: C.infoBg, border: `1.5px solid ${C.primary}30`, borderRadius: 16, padding: 18 }}>
-            <p style={{ ...T.titleLarge, marginBottom: 2 }}>{nextAppt.doctorName}</p>
-            <p style={{ ...T.bodyMedium, marginBottom: 12 }}>{nextAppt.specialty}</p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+          <View style={{ backgroundColor: C.infoBg, borderWidth: 1.5, borderColor: C.primary + '30', borderRadius: 16, padding: 18 }}>
+            <Text style={{ ...T.titleLarge, marginBottom: 2 }}>{nextAppt.doctorName}</Text>
+            <Text style={{ ...T.bodyMedium, marginBottom: 12 }}>{nextAppt.specialty}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 6 }}>
               <Calendar size={14} color={C.textMuted} />
-              <span style={{ ...T.bodyMedium }}>
-                {MONTHS[nextAppt.dateTime.getMonth()]} {nextAppt.dateTime.getDate()}, {nextAppt.dateTime.getFullYear()}
-              </span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 14 }}>
+              <Text style={{ ...T.bodyMedium }}>{MONTHS[nextAppt.dateTime.getMonth()]} {nextAppt.dateTime.getDate()}, {nextAppt.dateTime.getFullYear()}</Text>
+            </View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 14 }}>
               <Pill size={14} color={C.textMuted} />
-              <span style={{ ...T.bodyMedium }}>{formatTime(nextAppt.dateTime)}</span>
-            </div>
-            <button
-              onClick={() => onNavChange(2)}
-              style={{ width: '100%', padding: '12px 0', borderRadius: 12, border: `1.5px solid ${C.border}`, background: 'transparent', color: C.textPrimary, cursor: 'pointer', fontWeight: 600, fontSize: 15 }}
+              <Text style={{ ...T.bodyMedium }}>{formatTime(nextAppt.dateTime)}</Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => onNavChange(2)}
+              style={{ width: '100%', paddingVertical: 12, borderRadius: 12, borderWidth: 1.5, borderColor: C.border, backgroundColor: 'transparent', alignItems: 'center' }}
             >
-              View All Appointments
-            </button>
-          </div>
+              <Text style={{ color: C.textPrimary, fontWeight: '600', fontSize: 15 }}>View All Appointments</Text>
+            </TouchableOpacity>
+          </View>
         ) : (
-          <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 16, padding: 18, textAlign: 'center' }}>
-            <p style={{ ...T.bodyMedium }}>No upcoming appointments.</p>
-          </div>
+          <View style={{ backgroundColor: C.surface, borderWidth: 1, borderColor: C.border, borderRadius: 16, padding: 18, alignItems: 'center' }}>
+            <Text style={{ ...T.bodyMedium }}>No upcoming appointments.</Text>
+          </View>
         )}
-      </div>
-    </div>
+      </View>
+    </View>
   )
 }

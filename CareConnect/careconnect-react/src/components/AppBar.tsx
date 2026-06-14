@@ -1,4 +1,6 @@
-import { ArrowLeft } from 'lucide-react'
+import { View, Text, TouchableOpacity } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { ArrowLeft } from 'lucide-react-native'
 import { C } from '../theme/styles'
 
 interface Props {
@@ -9,41 +11,34 @@ interface Props {
 }
 
 export default function AppBar({ title, onBack, backLabel = 'Back', actions }: Props) {
+  const insets = useSafeAreaInsets()
+
   return (
-    <header style={{
-      background: C.primary,
-      color: C.textOnPrimary,
-      padding: '0 16px',
-      height: 56,
-      display: 'flex',
+    <View style={{
+      backgroundColor: C.primary,
+      paddingTop: insets.top,
+      paddingHorizontal: 16,
+      height: 56 + insets.top,
+      flexDirection: 'row',
       alignItems: 'center',
       gap: 12,
       flexShrink: 0,
     }}>
       {onBack && (
-        <button
-          aria-label={backLabel}
-          onClick={onBack}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: C.textOnPrimary,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 4,
-            padding: '8px 0',
-            flexShrink: 0,
-          }}
+        <TouchableOpacity
+          onPress={onBack}
+          style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 8, flexShrink: 0 }}
         >
-          <ArrowLeft size={20} />
-          <span style={{ fontSize: 14, fontWeight: 500 }}>{backLabel}</span>
-        </button>
+          <ArrowLeft size={20} color={C.textOnPrimary} />
+          <Text style={{ fontSize: 14, fontWeight: '500', color: C.textOnPrimary }}>{backLabel}</Text>
+        </TouchableOpacity>
       )}
-      <span style={{ flex: 1, fontSize: 20, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+      <Text numberOfLines={1} style={{ flex: 1, fontSize: 20, fontWeight: '700', color: C.textOnPrimary }}>
         {title}
-      </span>
-      {actions && <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>{actions}</div>}
-    </header>
+      </Text>
+      {actions && (
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>{actions}</View>
+      )}
+    </View>
   )
 }

@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react'
+import { View, Text, TouchableOpacity } from 'react-native'
 import { C } from '../theme/styles'
 
 interface ToastItem {
@@ -28,42 +29,37 @@ export default function ToastContainer() {
   }, [add])
 
   return (
-    <div style={{
-      position: 'fixed',
-      bottom: 80,
-      left: '50%',
-      transform: 'translateX(-50%)',
-      width: 'min(440px, calc(100vw - 32px))',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: 8,
-      zIndex: 1000,
-      pointerEvents: 'none',
-    }}>
+    <View
+      pointerEvents="box-none"
+      style={{
+        position: 'absolute',
+        bottom: 80,
+        left: 16,
+        right: 16,
+        gap: 8,
+        zIndex: 1000,
+      }}
+    >
       {toasts.map(t => (
-        <div key={t.id} style={{
-          background: C.textPrimary,
-          color: C.textOnPrimary,
+        <View key={t.id} style={{
+          backgroundColor: C.textPrimary,
           borderRadius: 12,
-          padding: '12px 16px',
-          display: 'flex',
+          paddingVertical: 12,
+          paddingHorizontal: 16,
+          flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'center',
           gap: 12,
-          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-          pointerEvents: 'all',
+          elevation: 4,
         }}>
-          <span style={{ fontSize: 15 }}>{t.message}</span>
+          <Text style={{ fontSize: 15, color: C.textOnPrimary, flex: 1 }}>{t.message}</Text>
           {t.action && (
-            <button
-              onClick={t.action.onClick}
-              style={{ background: 'none', border: 'none', color: '#93C5FD', fontWeight: 600, fontSize: 14, cursor: 'pointer', flexShrink: 0 }}
-            >
-              {t.action.label}
-            </button>
+            <TouchableOpacity onPress={t.action.onClick} style={{ flexShrink: 0 }}>
+              <Text style={{ color: '#93C5FD', fontWeight: '600', fontSize: 14 }}>{t.action.label}</Text>
+            </TouchableOpacity>
           )}
-        </div>
+        </View>
       ))}
-    </div>
+    </View>
   )
 }

@@ -1,8 +1,13 @@
-import { useNavigate } from 'react-router-dom'
-import { ShoppingBag, RefreshCw, MapPin, Phone, Clock, CheckCircle } from 'lucide-react'
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native'
+import { useNavigation } from '@react-navigation/native'
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { ShoppingBag, RefreshCw, MapPin, Phone, Clock, CheckCircle } from 'lucide-react-native'
 import AppBar from '../components/AppBar'
 import ContextBar from '../components/ContextBar'
 import { C, T } from '../theme/styles'
+import type { RootStackParamList } from '../App'
+
+type Nav = NativeStackNavigationProp<RootStackParamList>
 
 const mockRefills = [
   { id: '1', name: 'Atorvastatin 20 mg', refillsLeft: 2, dueDate: 'Jun 20, 2026', status: 'due-soon' },
@@ -18,35 +23,34 @@ const pharmacy = {
 }
 
 export default function PharmacyScreen() {
-  const navigate = useNavigate()
+  const navigation = useNavigation<Nav>()
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', background: C.background }}>
-      <AppBar title="Pharmacy" onBack={() => navigate(-1)} backLabel="Home" />
+    <View style={{ flex: 1, backgroundColor: C.background }}>
+      <AppBar title="Pharmacy" onBack={() => navigation.goBack()} backLabel="Home" />
       <ContextBar label="Home › Pharmacy" />
 
-      <div style={{ flex: 1, overflowY: 'auto', padding: 20 }}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20 }}>
 
         {/* Pharmacy Info */}
-        <div style={{ background: C.primary, borderRadius: 16, padding: 20, marginBottom: 24 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+        <View style={{ backgroundColor: C.primary, borderRadius: 16, padding: 20, marginBottom: 24 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 14 }}>
             <ShoppingBag size={24} color="white" />
-            <span style={{ ...T.titleLarge, color: 'white' }}>{pharmacy.name}</span>
-          </div>
+            <Text style={{ ...T.titleLarge, color: 'white' }}>{pharmacy.name}</Text>
+          </View>
           {[
             { icon: MapPin, text: pharmacy.address },
             { icon: Phone, text: pharmacy.phone },
             { icon: Clock, text: pharmacy.hours },
           ].map(({ icon: Icon, text }) => (
-            <div key={text} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+            <View key={text} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
               <Icon size={15} color="rgba(255,255,255,0.75)" />
-              <span style={{ ...T.bodyMedium, color: 'rgba(255,255,255,0.85)', fontSize: 14 }}>{text}</span>
-            </div>
+              <Text style={{ ...T.bodyMedium, color: 'rgba(255,255,255,0.85)', fontSize: 14 }}>{text}</Text>
+            </View>
           ))}
-        </div>
+        </View>
 
-        {/* Refills */}
-        <h2 style={{ ...T.headlineMedium, marginBottom: 12 }}>Prescription Refills</h2>
+        <Text style={{ ...T.headlineMedium, marginBottom: 12 }}>Prescription Refills</Text>
 
         {mockRefills.map(rx => {
           const isUrgent = rx.status === 'urgent'
@@ -55,44 +59,46 @@ export default function PharmacyScreen() {
           const bgColor = isUrgent ? C.redBg : isDueSoon ? C.warningBg : C.surface
 
           return (
-            <div key={rx.id} style={{ background: bgColor, border: `1.5px solid ${borderColor}`, borderRadius: 16, padding: 16, marginBottom: 12 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-                <div>
-                  <p style={{ ...T.labelLarge }}>{rx.name}</p>
-                  <p style={{ ...T.caption, marginTop: 2 }}>Due: {rx.dueDate}</p>
-                </div>
-                <span style={{
-                  background: isUrgent ? C.red + '18' : isDueSoon ? C.warning + '18' : C.success + '18',
-                  border: `1px solid ${isUrgent ? C.red : isDueSoon ? C.warning : C.success}`,
-                  color: isUrgent ? C.red : isDueSoon ? C.warning : C.success,
-                  borderRadius: 20, padding: '3px 8px', fontSize: 12, fontWeight: 700,
+            <View key={rx.id} style={{ backgroundColor: bgColor, borderWidth: 1.5, borderColor, borderRadius: 16, padding: 16, marginBottom: 12 }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+                <View>
+                  <Text style={{ ...T.labelLarge }}>{rx.name}</Text>
+                  <Text style={{ ...T.caption, marginTop: 2 }}>Due: {rx.dueDate}</Text>
+                </View>
+                <View style={{
+                  backgroundColor: isUrgent ? C.red + '18' : isDueSoon ? C.warning + '18' : C.success + '18',
+                  borderWidth: 1,
+                  borderColor: isUrgent ? C.red : isDueSoon ? C.warning : C.success,
+                  borderRadius: 20, paddingVertical: 3, paddingHorizontal: 8,
                 }}>
-                  {isUrgent ? 'No refills' : isDueSoon ? `${rx.refillsLeft} left` : `${rx.refillsLeft} left`}
-                </span>
-              </div>
-              <button style={{
-                width: '100%', padding: '12px 0', borderRadius: 12,
-                background: isUrgent ? C.red : C.primary,
-                color: 'white', border: 'none', cursor: 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                fontWeight: 600, fontSize: 15,
+                  <Text style={{ fontSize: 12, fontWeight: '700', color: isUrgent ? C.red : isDueSoon ? C.warning : C.success }}>
+                    {isUrgent ? 'No refills' : `${rx.refillsLeft} left`}
+                  </Text>
+                </View>
+              </View>
+              <TouchableOpacity style={{
+                width: '100%', paddingVertical: 12, borderRadius: 12,
+                backgroundColor: isUrgent ? C.red : C.primary,
+                flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
               }}>
-                <RefreshCw size={16} />
-                {isUrgent ? 'Request Emergency Refill' : 'Request Refill'}
-              </button>
-            </div>
+                <RefreshCw size={16} color="white" />
+                <Text style={{ color: 'white', fontWeight: '600', fontSize: 15 }}>
+                  {isUrgent ? 'Request Emergency Refill' : 'Request Refill'}
+                </Text>
+              </TouchableOpacity>
+            </View>
           )
         })}
 
-        {/* Order History */}
-        <h2 style={{ ...T.headlineMedium, marginBottom: 12, marginTop: 8 }}>Recent Orders</h2>
+        <Text style={{ ...T.headlineMedium, marginBottom: 12, marginTop: 8 }}>Recent Orders</Text>
         {['Metformin 500 mg — Picked up Jun 1', 'Lisinopril 10 mg — Picked up May 18'].map(item => (
-          <div key={item} style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 12, padding: '12px 16px', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 10 }}>
+          <View key={item} style={{ backgroundColor: C.surface, borderWidth: 1, borderColor: C.border, borderRadius: 12, paddingVertical: 12, paddingHorizontal: 16, marginBottom: 8, flexDirection: 'row', alignItems: 'center', gap: 10 }}>
             <CheckCircle size={18} color={C.success} />
-            <span style={{ ...T.bodyMedium }}>{item}</span>
-          </div>
+            <Text style={{ ...T.bodyMedium }}>{item}</Text>
+          </View>
         ))}
-      </div>
-    </div>
+
+      </ScrollView>
+    </View>
   )
 }
