@@ -18,6 +18,7 @@ export const useAccountStore = create<AccountState>((set) => ({
   email: '',
   avatarInitials: '',
 
+  //Sign in  with email and password, simulating an async API call
   signIn: async (email, _password) => {
     set({ isLoading: true })
     await new Promise<void>(resolve => setTimeout(resolve, 1000))
