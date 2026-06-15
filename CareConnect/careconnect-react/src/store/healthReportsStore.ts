@@ -30,7 +30,7 @@ export const useHealthReportsStore = create<HealthReportsState>((set) => ({
 
   generateReport: async (title, period) => {
     set({ isGenerating: true })
-    await new Promise(resolve => setTimeout(resolve, 1500))
+    await new Promise<void>(resolve => setTimeout(resolve, 1500))
     const newReport: HealthReport = {
       id: `rpt${Date.now()}`,
       title,

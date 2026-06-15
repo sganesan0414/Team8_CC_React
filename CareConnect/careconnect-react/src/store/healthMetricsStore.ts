@@ -83,7 +83,7 @@ export const useHealthMetricsStore = create<HealthMetricsState>((set) => ({
 
   addReading: async (metricId, value, secondaryValue) => {
     set({ isAddingReading: true })
-    await new Promise(resolve => setTimeout(resolve, 800))
+    await new Promise<void>(resolve => setTimeout(resolve, 800))
     const reading: VitalReading = { timestamp: new Date(), value, secondaryValue }
     set(s => ({
       isAddingReading: false,
