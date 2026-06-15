@@ -18,9 +18,10 @@ export const useAccountStore = create<AccountState>((set) => ({
   email: '',
   avatarInitials: '',
 
+  //Sign in  with email and password, simulating an async API call
   signIn: async (email, _password) => {
     set({ isLoading: true })
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await new Promise<void>(resolve => setTimeout(resolve, 1000))
     const rawName = email.split('@')[0].replace(/[._]/g, ' ')
     const displayName = rawName.replace(/\b\w/g, c => c.toUpperCase())
     const initials = displayName.split(' ').map(w => w[0]).slice(0, 2).join('')

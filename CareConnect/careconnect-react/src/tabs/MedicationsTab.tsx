@@ -27,7 +27,7 @@ export default function MedicationsTab({ onNavChange: _ }: Props) {
       label: 'Undo',
       onClick: () => undoTaken(med.id),
     })
-    await new Promise(r => setTimeout(r, 1500))
+    await new Promise<void>(r => setTimeout(r, 1500))
     setCooling(c => ({ ...c, [med.id]: false }))
   }
 
