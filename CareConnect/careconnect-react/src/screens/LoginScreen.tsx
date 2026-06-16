@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { View, Text, TextInput, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { Shield, Mail, Lock, Eye, EyeOff, Fingerprint, Scan, LogIn, Users, Pin } from 'lucide-react-native'
+import { Shield, Mail, Lock, Eye, EyeOff, Fingerprint, Scan, LogIn, Users, Pin, AlertCircle } from 'lucide-react-native'
 import { useAccountStore } from '../store/accountStore'
 import { C, T, btnPrimary, btnOutlined, inputBase } from '../theme/styles'
 import type { RootStackParamList } from '../App'
@@ -11,16 +11,39 @@ type Nav = NativeStackNavigationProp<RootStackParamList>
 
 export default function LoginScreen() {
   const navigation = useNavigation<Nav>()
-  const { signIn, isLoading } = useAccountStore()
+  const { signIn, isLoading, authError, clearAuthError } = useAccountStore()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [emailFocused, setEmailFocused] = useState(false)
   const [passwordFocused, setPasswordFocused] = useState(false)
+  const [fieldErrors, setFieldErrors] = useState({ email: '', password: '' })
+
+  const validate = () => {
+    const errors = { email: '', password: '' }
+    if (!email.trim()) errors.email = 'Email is required.'
+    if (!password) errors.password = 'Password is required.'
+    setFieldErrors(errors)
+    return !errors.email && !errors.password
+  }
 
   const handleSignIn = async () => {
     if (isLoading) return
+    clearAuthError()
+    if (!validate()) return
     await signIn(email, password)
+  }
+
+  const handleEmailChange = (v: string) => {
+    setEmail(v)
+    if (fieldErrors.email) setFieldErrors(e => ({ ...e, email: '' }))
+    if (authError) clearAuthError()
+  }
+
+  const handlePasswordChange = (v: string) => {
+    setPassword(v)
+    if (fieldErrors.password) setFieldErrors(e => ({ ...e, password: '' }))
+    if (authError) clearAuthError()
   }
 
   return (
@@ -54,25 +77,34 @@ export default function LoginScreen() {
         <View style={{ flex: 1, height: 1, backgroundColor: C.border }} />
       </View>
 
+      {/* Auth error banner */}
+      {authError ? (
+        <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10, backgroundColor: C.redBg, borderWidth: 1, borderColor: C.red, borderRadius: 10, padding: 12, marginBottom: 16 }}>
+          <AlertCircle size={18} color={C.red} style={{ marginTop: 1 }} />
+          <Text style={{ color: C.red, fontSize: 14, flex: 1, lineHeight: 20 }}>{authError}</Text>
+        </View>
+      ) : null}
+
       {/* Email */}
       <View style={{ gap: 6, marginBottom: 16 }}>
         <Text style={{ ...T.labelMedium }}>Email</Text>
         <View style={{ position: 'relative' }}>
           <View style={{ position: 'absolute', left: 14, top: 0, bottom: 0, justifyContent: 'center', zIndex: 1 }}>
-            <Mail size={18} color={C.textMuted} />
+            <Mail size={18} color={fieldErrors.email ? C.red : C.textMuted} />
           </View>
           <TextInput
             value={email}
-            onChangeText={setEmail}
+            onChangeText={handleEmailChange}
             placeholder="user@example.com"
             keyboardType="email-address"
             autoCapitalize="none"
             autoCorrect={false}
             onFocus={() => setEmailFocused(true)}
             onBlur={() => setEmailFocused(false)}
-            style={{ ...inputBase, paddingLeft: 44, borderColor: emailFocused ? C.primary : C.border, borderWidth: emailFocused ? 2 : 1.5 }}
+            style={{ ...inputBase, paddingLeft: 44, borderColor: fieldErrors.email ? C.red : emailFocused ? C.primary : C.border, borderWidth: fieldErrors.email || emailFocused ? 2 : 1.5 }}
           />
         </View>
+        {fieldErrors.email ? <Text style={{ color: C.red, fontSize: 13 }}>{fieldErrors.email}</Text> : null}
       </View>
 
       {/* Password */}
@@ -80,17 +112,17 @@ export default function LoginScreen() {
         <Text style={{ ...T.labelMedium }}>Password</Text>
         <View style={{ position: 'relative' }}>
           <View style={{ position: 'absolute', left: 14, top: 0, bottom: 0, justifyContent: 'center', zIndex: 1 }}>
-            <Lock size={18} color={C.textMuted} />
+            <Lock size={18} color={fieldErrors.password ? C.red : C.textMuted} />
           </View>
           <TextInput
             value={password}
-            onChangeText={setPassword}
+            onChangeText={handlePasswordChange}
             placeholder="Enter your password"
             secureTextEntry={!showPassword}
             onFocus={() => setPasswordFocused(true)}
             onBlur={() => setPasswordFocused(false)}
             onSubmitEditing={handleSignIn}
-            style={{ ...inputBase, paddingLeft: 44, paddingRight: 48, borderColor: passwordFocused ? C.primary : C.border, borderWidth: passwordFocused ? 2 : 1.5 }}
+            style={{ ...inputBase, paddingLeft: 44, paddingRight: 48, borderColor: fieldErrors.password ? C.red : passwordFocused ? C.primary : C.border, borderWidth: fieldErrors.password || passwordFocused ? 2 : 1.5 }}
           />
           <TouchableOpacity
             onPress={() => setShowPassword(!showPassword)}
@@ -99,11 +131,12 @@ export default function LoginScreen() {
             {showPassword ? <EyeOff size={18} color={C.textMuted} /> : <Eye size={18} color={C.textMuted} />}
           </TouchableOpacity>
         </View>
+        {fieldErrors.password ? <Text style={{ color: C.red, fontSize: 13 }}>{fieldErrors.password}</Text> : null}
       </View>
 
       {/* Forgot password */}
       <View style={{ alignItems: 'flex-end', marginBottom: 24 }}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
           <Text style={{ color: C.primary, fontWeight: '600', fontSize: 14 }}>Forgot Password?</Text>
         </TouchableOpacity>
       </View>

@@ -4,6 +4,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { useAccountStore } from './store/accountStore'
 import LoginScreen from './screens/LoginScreen'
 import CreateAccountScreen from './screens/CreateAccountScreen'
+import ForgotPasswordScreen from './screens/ForgotPasswordScreen'
 import DashboardScreen from './screens/DashboardScreen'
 import HealthMetricsScreen from './screens/HealthMetricsScreen'
 import HealthReportsScreen from './screens/HealthReportsScreen'
@@ -14,6 +15,7 @@ import SettingsScreen from './screens/SettingsScreen'
 export type RootStackParamList = {
   Login: undefined
   CreateAccount: undefined
+  ForgotPassword: undefined
   Dashboard: undefined
   HealthMetrics: undefined
   HealthReports: undefined
@@ -35,6 +37,7 @@ export default function App() {
             <>
               <Stack.Screen name="Login" component={LoginScreen} />
               <Stack.Screen name="CreateAccount" component={CreateAccountScreen} />
+              <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
             </>
           ) : (
             <>
