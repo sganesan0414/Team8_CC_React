@@ -17,8 +17,11 @@
       "**/__tests__/**/*.test.tsx"
     ],
     "transformIgnorePatterns": [
-      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg|zustand)"
-    ]
+      "node_modules/(?!((jest-)?react-native|@react-native(-community)?|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg|zustand))"
+    ],
+    "moduleNameMapper": {
+      "@react-native-async-storage/async-storage": "@react-native-async-storage/async-storage/jest/async-storage-mock"
+    }
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.24.0",
@@ -36,10 +39,13 @@
   },
   "devDependencies": {
     "@babel/core": "^7.24.0",
+    "@testing-library/react-native": "^12.9.0",
     "@types/jest": "^29.5.14",
     "@types/react": "~18.2.0",
     "babel-preset-expo": "~11.0.0",
+    "jest": "^29.7.0",
     "jest-expo": "~51.0.0",
+    "react-test-renderer": "^18.2.0",
     "typescript": "~5.3.3"
   }
 }
