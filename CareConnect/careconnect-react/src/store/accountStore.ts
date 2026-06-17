@@ -2,11 +2,18 @@ import { create } from 'zustand'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const ACCOUNTS_KEY = 'cc_accounts'
+const PIN_KEY = 'cc_pin'
+const BIOMETRIC_KEY = 'cc_biometric_email'
 
 interface StoredAccount {
   email: string
   password: string
   name: string
+}
+
+interface StoredPin {
+  pin: string
+  email: string
 }
 
 interface AccountState {
@@ -23,6 +30,22 @@ interface AccountState {
   clearAuthError: () => void
   signOut: () => void
   updateProfile: (name: string) => void
+  setPin: (pin: string) => Promise<void>
+  signInWithPin: (pin: string) => Promise<boolean>
+  isPinSet: () => Promise<boolean>
+  clearPin: () => Promise<void>
+  signInWithBiometric: () => Promise<boolean>
+  isBiometricLinked: () => Promise<boolean>
+  unlinkBiometric: () => Promise<void>
+}
+
+async function getStoredPin(): Promise<StoredPin | null> {
+  try {
+    const raw = await AsyncStorage.getItem(PIN_KEY)
+    return raw ? JSON.parse(raw) : null
+  } catch {
+    return null
+  }
 }
 
 async function getAccounts(): Promise<StoredAccount[]> {
@@ -42,7 +65,7 @@ function makeInitials(name: string): string {
   return name.split(' ').map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase()
 }
 
-export const useAccountStore = create<AccountState>((set) => ({
+export const useAccountStore = create<AccountState>((set, get) => ({
   isLoggedIn: false,
   isLoading: false,
   displayName: '',
@@ -68,6 +91,7 @@ export const useAccountStore = create<AccountState>((set) => ({
       return
     }
 
+    await AsyncStorage.setItem(BIOMETRIC_KEY, account.email)
     set({
       isLoggedIn: true,
       isLoading: false,
@@ -93,6 +117,7 @@ export const useAccountStore = create<AccountState>((set) => ({
     const newAccount: StoredAccount = { name: name.trim(), email: email.trim().toLowerCase(), password }
     await saveAccounts([...accounts, newAccount])
 
+    await AsyncStorage.setItem(BIOMETRIC_KEY, newAccount.email)
     set({
       isLoggedIn: true,
       isLoading: false,
@@ -124,5 +149,60 @@ export const useAccountStore = create<AccountState>((set) => ({
 
   updateProfile: (name) => {
     set({ displayName: name, avatarInitials: makeInitials(name) })
+  },
+
+  setPin: async (pin) => {
+    const { email } = get()
+    await AsyncStorage.setItem(PIN_KEY, JSON.stringify({ pin, email }))
+  },
+
+  signInWithPin: async (pin) => {
+    const stored = await getStoredPin()
+    if (!stored || stored.pin !== pin) return false
+    const accounts = await getAccounts()
+    const account = accounts.find(a => a.email === stored.email)
+    if (!account) return false
+    set({
+      isLoggedIn: true,
+      displayName: account.name,
+      email: account.email,
+      avatarInitials: makeInitials(account.name),
+      authError: null,
+    })
+    return true
+  },
+
+  isPinSet: async () => {
+    const stored = await getStoredPin()
+    return stored !== null
+  },
+
+  clearPin: async () => {
+    await AsyncStorage.removeItem(PIN_KEY)
+  },
+
+  signInWithBiometric: async () => {
+    const email = await AsyncStorage.getItem(BIOMETRIC_KEY)
+    if (!email) return false
+    const accounts = await getAccounts()
+    const account = accounts.find(a => a.email === email)
+    if (!account) return false
+    set({
+      isLoggedIn: true,
+      displayName: account.name,
+      email: account.email,
+      avatarInitials: makeInitials(account.name),
+      authError: null,
+    })
+    return true
+  },
+
+  isBiometricLinked: async () => {
+    const email = await AsyncStorage.getItem(BIOMETRIC_KEY)
+    return email !== null
+  },
+
+  unlinkBiometric: async () => {
+    await AsyncStorage.removeItem(BIOMETRIC_KEY)
   },
 }))

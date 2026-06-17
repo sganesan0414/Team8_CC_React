@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { User, Bell, Shield, Accessibility, Palette, HelpCircle, ChevronRight, LogOut } from 'lucide-react-native'
+import { User, Bell, Shield, Lock, Accessibility, Palette, HelpCircle, ChevronRight, LogOut } from 'lucide-react-native'
 import { useAccountStore } from '../store/accountStore'
 import AppBar from '../components/AppBar'
 import ContextBar from '../components/ContextBar'
@@ -9,27 +9,29 @@ import { C, T } from '../theme/styles'
 import type { RootStackParamList } from '../App'
 
 type Nav = NativeStackNavigationProp<RootStackParamList>
+type SettingsRoute = keyof RootStackParamList | null
 
 const settingsSections = [
   {
     title: 'Account',
     items: [
-      { icon: User,   label: 'My Profile',        route: 'Profile' as keyof RootStackParamList },
-      { icon: Bell,   label: 'Notifications',      route: null },
-      { icon: Shield, label: 'Privacy & Security', route: null },
+      { icon: User,   label: 'My Profile',        route: 'Profile'  as SettingsRoute },
+      { icon: Bell,   label: 'Notifications',      route: null       as SettingsRoute },
+      { icon: Shield, label: 'Privacy & Security', route: null       as SettingsRoute },
+      { icon: Lock,   label: 'PIN Login',          route: 'PinSetup' as SettingsRoute },
     ],
   },
   {
     title: 'Preferences',
     items: [
-      { icon: Accessibility, label: 'Accessibility', route: null },
-      { icon: Palette,       label: 'Appearance',    route: null },
+      { icon: Accessibility, label: 'Accessibility', route: null as SettingsRoute },
+      { icon: Palette,       label: 'Appearance',    route: null as SettingsRoute },
     ],
   },
   {
     title: 'Support',
     items: [
-      { icon: HelpCircle, label: 'Help & Support', route: null },
+      { icon: HelpCircle, label: 'Help & Support', route: null as SettingsRoute },
     ],
   },
 ]
@@ -55,7 +57,7 @@ export default function SettingsScreen() {
                 return (
                   <TouchableOpacity
                     key={item.label}
-                    onPress={() => item.route ? navigation.navigate(item.route) : undefined}
+                    onPress={() => item.route ? navigation.navigate(item.route as keyof RootStackParamList) : undefined}
                     style={{
                       flexDirection: 'row', alignItems: 'center', gap: 14,
                       paddingVertical: 14, paddingHorizontal: 16,

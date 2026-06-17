@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { View, Text, TextInput, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native'
+import * as LocalAuthentication from 'expo-local-authentication'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Shield, Mail, Lock, Eye, EyeOff, Fingerprint, Scan, LogIn, Users, Pin, AlertCircle } from 'lucide-react-native'
@@ -11,13 +12,41 @@ type Nav = NativeStackNavigationProp<RootStackParamList>
 
 export default function LoginScreen() {
   const navigation = useNavigation<Nav>()
-  const { signIn, isLoading, authError, clearAuthError } = useAccountStore()
+  const { signIn, isLoading, authError, clearAuthError, isPinSet, signInWithBiometric, isBiometricLinked } = useAccountStore()
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [emailFocused, setEmailFocused] = useState(false)
   const [passwordFocused, setPasswordFocused] = useState(false)
   const [fieldErrors, setFieldErrors] = useState({ email: '', password: '' })
+  const [pinAvailable, setPinAvailable] = useState(false)
+  const [biometricTypes, setBiometricTypes] = useState<number[]>([])
+
+  useEffect(() => {
+    isPinSet().then(setPinAvailable)
+    ;(async () => {
+      const hasHardware = await LocalAuthentication.hasHardwareAsync()
+      const isEnrolled = await LocalAuthentication.isEnrolledAsync()
+      const linked = await isBiometricLinked()
+      if (hasHardware && isEnrolled && linked) {
+        const types = await LocalAuthentication.supportedAuthenticationTypesAsync()
+        setBiometricTypes(types)
+      }
+    })()
+  }, [])
+
+  const handleBiometric = async () => {
+    const result = await LocalAuthentication.authenticateAsync({
+      promptMessage: 'Sign in to CareConnect',
+      fallbackLabel: 'Use PIN',
+      cancelLabel: 'Cancel',
+      disableDeviceFallback: false,
+    })
+    if (result.success) {
+      await signInWithBiometric()
+    }
+  }
 
   const validate = () => {
     const errors = { email: '', password: '' }
@@ -62,12 +91,29 @@ export default function LoginScreen() {
       {/* Quick Sign In */}
       <Text style={{ ...T.titleLarge, color: C.primary, marginBottom: 14 }}>Quick Sign In</Text>
       <View style={{ flexDirection: 'row', gap: 14, marginBottom: 32 }}>
-        {[{ icon: Fingerprint, label: 'Fingerprint' }, { icon: Scan, label: 'Face ID' }].map(({ icon: Icon, label }) => (
-          <TouchableOpacity key={label} style={{ flex: 1, height: 96, backgroundColor: C.surface, borderWidth: 1.5, borderColor: C.border, borderRadius: 14, alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-            <Icon size={36} color={C.textPrimary} />
-            <Text style={{ ...T.labelLarge }}>{label}</Text>
-          </TouchableOpacity>
-        ))}
+        {[
+          { icon: Fingerprint, label: 'Fingerprint', type: LocalAuthentication.AuthenticationType.FINGERPRINT },
+          { icon: Scan,        label: 'Face ID',     type: LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION },
+        ].map(({ icon: Icon, label, type }) => {
+          const available = biometricTypes.includes(type)
+          return (
+            <TouchableOpacity
+              key={label}
+              onPress={available ? handleBiometric : undefined}
+              style={{
+                flex: 1, height: 96, borderRadius: 14,
+                alignItems: 'center', justifyContent: 'center', gap: 8,
+                backgroundColor: available ? C.primaryLight : C.surface,
+                borderWidth: 1.5,
+                borderColor: available ? C.primary : C.border,
+                opacity: available ? 1 : 0.45,
+              }}
+            >
+              <Icon size={36} color={available ? C.primary : C.textPrimary} />
+              <Text style={{ ...T.labelLarge, color: available ? C.primary : C.textPrimary }}>{label}</Text>
+            </TouchableOpacity>
+          )
+        })}
       </View>
 
       {/* Divider */}
@@ -161,10 +207,15 @@ export default function LoginScreen() {
       </TouchableOpacity>
 
       {/* PIN */}
-      <TouchableOpacity style={{ ...btnOutlined, marginBottom: 8 }}>
-        <Pin size={18} color={C.textPrimary} />
-        <Text style={{ color: C.textPrimary, fontSize: 16, fontWeight: '600' }}>Use PIN instead</Text>
-      </TouchableOpacity>
+      {pinAvailable && (
+        <TouchableOpacity
+          onPress={() => navigation.navigate('PinEntry')}
+          style={{ ...btnOutlined, marginBottom: 8 }}
+        >
+          <Pin size={18} color={C.textPrimary} />
+          <Text style={{ color: C.textPrimary, fontSize: 16, fontWeight: '600' }}>Use PIN instead</Text>
+        </TouchableOpacity>
+      )}
 
       {/* Create account */}
       <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 4, marginBottom: 8 }}>

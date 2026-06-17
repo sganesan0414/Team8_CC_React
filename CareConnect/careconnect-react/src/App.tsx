@@ -5,6 +5,7 @@ import { useAccountStore } from './store/accountStore'
 import LoginScreen from './screens/LoginScreen'
 import CreateAccountScreen from './screens/CreateAccountScreen'
 import ForgotPasswordScreen from './screens/ForgotPasswordScreen'
+import PinScreen from './screens/PinScreen'
 import DashboardScreen from './screens/DashboardScreen'
 import HealthMetricsScreen from './screens/HealthMetricsScreen'
 import HealthReportsScreen from './screens/HealthReportsScreen'
@@ -16,12 +17,14 @@ export type RootStackParamList = {
   Login: undefined
   CreateAccount: undefined
   ForgotPassword: undefined
+  PinEntry: undefined
   Dashboard: undefined
   HealthMetrics: undefined
   HealthReports: undefined
   Pharmacy: undefined
   Profile: undefined
   Settings: undefined
+  PinSetup: undefined
 }
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
@@ -38,6 +41,7 @@ export default function App() {
               <Stack.Screen name="Login" component={LoginScreen} />
               <Stack.Screen name="CreateAccount" component={CreateAccountScreen} />
               <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+              <Stack.Screen name="PinEntry" component={PinScreen} />
             </>
           ) : (
             <>
@@ -47,6 +51,7 @@ export default function App() {
               <Stack.Screen name="Pharmacy" component={PharmacyScreen} />
               <Stack.Screen name="Profile" component={UserProfileScreen} />
               <Stack.Screen name="Settings" component={SettingsScreen} />
+              <Stack.Screen name="PinSetup" component={PinScreen} />
             </>
           )}
         </Stack.Navigator>

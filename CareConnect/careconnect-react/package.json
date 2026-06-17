@@ -25,6 +25,7 @@
     "@react-navigation/native": "^6.1.17",
     "@react-navigation/native-stack": "^6.9.26",
     "expo": "~51.0.0",
+    "expo-local-authentication": "~14.0.1",
     "lucide-react-native": "^0.400.0",
     "react": "18.2.0",
     "react-native": "0.74.5",
