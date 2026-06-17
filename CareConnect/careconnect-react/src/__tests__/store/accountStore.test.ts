@@ -1,9 +1,17 @@
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useAccountStore } from '../../store/accountStore'
+
+const ACCOUNTS_KEY = 'cc_accounts'
+
+async function seedAccounts(accounts: { email: string; name: string; password: string }[]) {
+  await AsyncStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts))
+}
 
 const initialState = useAccountStore.getState()
 
-beforeEach(() => {
+beforeEach(async () => {
   useAccountStore.setState(initialState, true)
+  await AsyncStorage.clear()
   jest.useFakeTimers()
 })
 
@@ -35,6 +43,15 @@ describe('accountStore', () => {
   })
 
   describe('signIn', () => {
+    beforeEach(async () => {
+      await seedAccounts([
+        { email: 'john.doe@example.com', name: 'John Doe', password: 'pass' },
+        { email: 'jane_smith@example.com', name: 'Jane Smith', password: 'pass' },
+        { email: 'alice@example.com', name: 'Alice', password: 'pass' },
+        { email: 'alice.bob.charlie@example.com', name: 'Alice Bob Charlie', password: 'pass' },
+      ])
+    })
+
     it('sets isLoading to true immediately on sign in', () => {
       const promise = useAccountStore.getState().signIn('john.doe@example.com', 'pass')
       expect(useAccountStore.getState().isLoading).toBe(true)
@@ -101,6 +118,7 @@ describe('accountStore', () => {
 
   describe('signOut', () => {
     beforeEach(async () => {
+      await seedAccounts([{ email: 'john.doe@example.com', name: 'John Doe', password: 'pass' }])
       const promise = useAccountStore.getState().signIn('john.doe@example.com', 'pass')
       jest.runAllTimers()
       await promise

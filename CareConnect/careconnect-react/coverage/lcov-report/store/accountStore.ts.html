@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">23.86% </span>
+                <span class="strong">26.13% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>21/88</span>
+                <span class='fraction'>23/88</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">19.23% </span>
+                <span class="strong">23.07% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>5/26</span>
+                <span class='fraction'>6/26</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">28.57% </span>
+                <span class="strong">32.14% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>8/28</span>
+                <span class='fraction'>9/28</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">25% </span>
+                <span class="strong">26.38% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>18/72</span>
+                <span class='fraction'>19/72</span>
             </div>
         
             
@@ -334,7 +334,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">36x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
@@ -351,20 +351,20 @@
 <span class="cline-any cline-yes">13x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">13x</span>
-<span class="cline-any cline-yes">13x</span>
+<span class="cline-any cline-yes">19x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">13x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">13x</span>
 <span class="cline-any cline-yes">13x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -530,7 +530,7 @@ async function <span class="fstat-no" title="function not covered" >getStoredPin
 async function getAccounts(): Promise&lt;StoredAccount[]&gt; {
   try {
     const raw = await AsyncStorage.getItem(ACCOUNTS_KEY)
-    return raw ? <span class="branch-0 cbranch-no" title="branch not covered" >JSON.parse(raw) </span>: []
+    return raw ? JSON.parse(raw) : <span class="branch-1 cbranch-no" title="branch not covered" >[]</span>
   } catch {
 <span class="cstat-no" title="statement not covered" >    return []</span>
   }
@@ -558,20 +558,20 @@ export const useAccountStore = create&lt;AccountState&gt;((set, get) =&gt; ({
     await new Promise&lt;void&gt;(resolve =&gt; setTimeout(resolve, 600))
 &nbsp;
     const accounts = await getAccounts()
-    const account = accounts.find(<span class="fstat-no" title="function not covered" >a </span>=&gt; <span class="cstat-no" title="statement not covered" >a.email.toLowerCase() === email.trim().toLowerCase())</span>
+    const account = accounts.find(a =&gt; a.email.toLowerCase() === email.trim().toLowerCase())
 &nbsp;
-    <span class="missing-if-branch" title="else path not taken" >E</span>if (!account) {
-      set({ isLoading: false, authError: 'No account found with this email. Please create an account first.' })
-      return
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (!account) {
+<span class="cstat-no" title="statement not covered" >      set({ isLoading: false, authError: 'No account found with this email. Please create an account first.' })</span>
+<span class="cstat-no" title="statement not covered" >      return</span>
     }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (account.password !== password) {</span>
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (account.password !== password) {
 <span class="cstat-no" title="statement not covered" >      set({ isLoading: false, authError: 'Incorrect password. Please try again.' })</span>
 <span class="cstat-no" title="statement not covered" >      return</span>
     }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    await AsyncStorage.setItem(BIOMETRIC_KEY, account.email)</span>
-<span class="cstat-no" title="statement not covered" >    set({</span>
+    await AsyncStorage.setItem(BIOMETRIC_KEY, account.email)
+    set({
       isLoggedIn: true,
       isLoading: false,
       displayName: account.name,
@@ -691,7 +691,7 @@ export const useAccountStore = create&lt;AccountState&gt;((set, get) =&gt; ({
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-06-17T01:42:59.820Z
+                at 2026-06-17T02:25:49.062Z
             </div>
         <script src="../prettify.js"></script>
         <script>

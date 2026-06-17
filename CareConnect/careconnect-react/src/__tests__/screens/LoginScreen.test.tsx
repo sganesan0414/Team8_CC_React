@@ -19,8 +19,19 @@ jest.mock('lucide-react-native', () => {
   return new Proxy({}, { get: () => Icon })
 })
 
+jest.mock('expo-local-authentication', () => ({
+  hasHardwareAsync: jest.fn().mockResolvedValue(false),
+  isEnrolledAsync: jest.fn().mockResolvedValue(false),
+  supportedAuthenticationTypesAsync: jest.fn().mockResolvedValue([]),
+  authenticateAsync: jest.fn().mockResolvedValue({ success: false }),
+  AuthenticationType: { FINGERPRINT: 1, FACIAL_RECOGNITION: 2 },
+}))
+
 const mockSignIn = jest.fn()
 const mockClearAuthError = jest.fn()
+const mockIsPinSet = jest.fn().mockResolvedValue(false)
+const mockIsBiometricLinked = jest.fn().mockResolvedValue(false)
+const mockSignInWithBiometric = jest.fn().mockResolvedValue(false)
 
 jest.mock('../../store/accountStore', () => ({
   useAccountStore: () => ({
@@ -28,6 +39,9 @@ jest.mock('../../store/accountStore', () => ({
     isLoading: false,
     authError: null,
     clearAuthError: mockClearAuthError,
+    isPinSet: mockIsPinSet,
+    isBiometricLinked: mockIsBiometricLinked,
+    signInWithBiometric: mockSignInWithBiometric,
   }),
 }))
 
