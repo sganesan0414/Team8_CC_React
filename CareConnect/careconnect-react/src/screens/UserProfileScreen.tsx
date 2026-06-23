@@ -43,19 +43,25 @@ export default function UserProfileScreen() {
                 : <User size={40} color="white" />
               }
             </View>
-            <TouchableOpacity style={{
-              position: 'absolute', bottom: 0, right: 0,
-              width: 28, height: 28, borderRadius: 14,
-              backgroundColor: C.accent, borderWidth: 2, borderColor: 'white',
-              alignItems: 'center', justifyContent: 'center',
-            }}>
+            <TouchableOpacity
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel="Change profile photo"
+              accessibilityHint="Tap to update your profile photo"
+              style={{
+                position: 'absolute', bottom: 0, right: 0,
+                width: 28, height: 28, borderRadius: 14,
+                backgroundColor: C.accent, borderWidth: 2, borderColor: 'white',
+                alignItems: 'center', justifyContent: 'center',
+              }}
+            >
               <Camera size={14} color="white" />
             </TouchableOpacity>
           </View>
         </View>
 
         <View style={{ backgroundColor: C.surface, borderRadius: 16, borderWidth: 1, borderColor: C.border, padding: 20, marginBottom: 20 }}>
-          <Text style={{ ...T.titleLarge, marginBottom: 16 }}>Personal Information</Text>
+          <Text accessible={true} accessibilityRole="header" style={{ ...T.titleLarge, marginBottom: 16 }}>Personal Information</Text>
 
           {[
             { icon: User,   label: 'Full Name', value: name,    setter: setName,    keyboardType: 'default' as const, disabled: false },
@@ -70,6 +76,10 @@ export default function UserProfileScreen() {
                   <Icon size={18} color={C.textMuted} />
                 </View>
                 <TextInput
+                  accessible={true}
+                  accessibilityLabel={label}
+                  accessibilityHint={disabled ? `${label} cannot be changed` : `Enter your ${label.toLowerCase()}`}
+                  accessibilityState={{ disabled }}
                   value={value}
                   onChangeText={v => (setter as (v: string) => void)(v)}
                   keyboardType={keyboardType}
@@ -83,6 +93,9 @@ export default function UserProfileScreen() {
           <View style={{ gap: 6 }}>
             <Text style={{ ...T.labelMedium }}>Date of Birth</Text>
             <TextInput
+              accessible={true}
+              accessibilityLabel="Date of birth"
+              accessibilityHint="Enter your date of birth in year, month, day format"
               value={dob}
               onChangeText={setDob}
               placeholder="YYYY-MM-DD"
@@ -93,6 +106,10 @@ export default function UserProfileScreen() {
         </View>
 
         <TouchableOpacity
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel={saved ? "Changes saved" : "Save changes"}
+          accessibilityHint="Tap to save your profile changes"
           onPress={handleSave}
           style={{ ...btnPrimary, backgroundColor: saved ? C.success : C.primary }}
         >

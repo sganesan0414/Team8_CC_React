@@ -35,6 +35,11 @@ export default function HealthReportsScreen() {
         backLabel="Home"
         actions={
           <TouchableOpacity
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel="New report"
+            accessibilityHint="Tap to open the new report form"
+            accessibilityState={{ expanded: showForm }}
             onPress={() => setShowForm(!showForm)}
             style={{ backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 8, paddingVertical: 6, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', gap: 4 }}
           >
@@ -49,11 +54,18 @@ export default function HealthReportsScreen() {
 
         {showForm && (
           <View style={{ backgroundColor: C.surface, borderRadius: 16, borderWidth: 1, borderColor: C.border, padding: 20, marginBottom: 24 }}>
-            <Text style={{ ...T.titleLarge, marginBottom: 16 }}>Generate New Report</Text>
+            <Text accessible={true} accessibilityRole="header" style={{ ...T.titleLarge, marginBottom: 16 }}>Generate New Report</Text>
 
             <View style={{ gap: 6, marginBottom: 12 }}>
               <Text style={{ ...T.labelMedium }}>Report Title</Text>
-              <TextInput value={title} onChangeText={setTitle} style={{ ...inputBase }} />
+              <TextInput
+                accessible={true}
+                accessibilityLabel="Report title"
+                accessibilityHint="Enter a title for this health report"
+                value={title}
+                onChangeText={setTitle}
+                style={{ ...inputBase }}
+              />
             </View>
 
             <View style={{ gap: 6, marginBottom: 16 }}>
@@ -67,6 +79,11 @@ export default function HealthReportsScreen() {
             </View>
 
             <TouchableOpacity
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel="Generate report"
+              accessibilityHint={isGenerating ? "Generating report, please wait" : "Tap to generate the health report"}
+              accessibilityState={{ disabled: isGenerating }}
               onPress={handleGenerate}
               disabled={isGenerating}
               style={{ ...btnPrimary, opacity: isGenerating ? 0.6 : 1 }}
@@ -79,7 +96,7 @@ export default function HealthReportsScreen() {
           </View>
         )}
 
-        <Text style={{ ...T.headlineMedium, marginBottom: 12 }}>Your Reports</Text>
+        <Text accessible={true} accessibilityRole="header" style={{ ...T.headlineMedium, marginBottom: 12 }}>Your Reports</Text>
 
         {reports.length === 0 && (
           <Text style={{ ...T.bodyMedium, textAlign: 'center', paddingVertical: 40 }}>No reports yet. Generate your first report above.</Text>
@@ -100,11 +117,17 @@ export default function HealthReportsScreen() {
               </View>
             </View>
             <Text style={{ ...T.bodyMedium, fontSize: 14, marginBottom: 14 }}>{report.summary}</Text>
-            <TouchableOpacity style={{
-              width: '100%', paddingVertical: 12, borderRadius: 12,
-              borderWidth: 1.5, borderColor: C.border, backgroundColor: 'transparent',
-              flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
-            }}>
+            <TouchableOpacity
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel={`Share report: ${report.title}`}
+              accessibilityHint="Tap to share this report"
+              style={{
+                width: '100%', paddingVertical: 12, borderRadius: 12,
+                borderWidth: 1.5, borderColor: C.border, backgroundColor: 'transparent',
+                flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
+              }}
+            >
               <Share2 size={16} color={C.textSecondary} />
               <Text style={{ color: C.textSecondary, fontSize: 15, fontWeight: '500' }}>Share Report</Text>
             </TouchableOpacity>

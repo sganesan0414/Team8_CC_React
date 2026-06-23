@@ -18,6 +18,11 @@ export default function Select({ value, options, onChange, placeholder = 'Select
   return (
     <>
       <TouchableOpacity
+        accessible={true}
+        accessibilityRole="combobox"
+        accessibilityLabel={`Select: ${selectedLabel}`}
+        accessibilityHint={`Press to open list with ${options.length} options`}
+        accessibilityState={{ expanded: open }}
         onPress={() => setOpen(true)}
         style={[{ ...inputBase, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }, style]}
       >
@@ -27,22 +32,43 @@ export default function Select({ value, options, onChange, placeholder = 'Select
         <ChevronDown size={18} color={C.textMuted} />
       </TouchableOpacity>
 
-      <Modal visible={open} transparent animationType="slide" onRequestClose={() => setOpen(false)}>
+      <Modal 
+        visible={open} 
+        transparent 
+        animationType="slide" 
+        onRequestClose={() => setOpen(false)}
+        accessibilityLabel="Select options"
+      >
         <TouchableOpacity
-          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.35)' }}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Close select menu"
           onPress={() => setOpen(false)}
+          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.35)' }}
           activeOpacity={1}
         />
-        <View style={{ backgroundColor: C.surface, borderRadius: 20, padding: 20, maxHeight: 320 }}>
-          <Text style={{ fontSize: 16, fontWeight: '600', color: C.textMuted, marginBottom: 12 }}>
+        <View 
+          accessible={false}
+          style={{ backgroundColor: C.surface, borderRadius: 20, padding: 20, maxHeight: 320 }}
+        >
+          <Text 
+            accessible={true}
+            accessibilityRole="header"
+            style={{ fontSize: 16, fontWeight: '600', color: C.textMuted, marginBottom: 12 }}
+          >
             {placeholder}
           </Text>
-          <ScrollView>
+          <ScrollView accessible={false}>
             {options.map(opt => (
               <TouchableOpacity
                 key={opt.value}
+                accessible={true}
+                accessibilityRole="menuitem"
+                accessibilityLabel={opt.label}
+                accessibilityState={{ selected: value === opt.value }}
+                accessibilityHint={`Select option: ${opt.label}`}
                 onPress={() => { onChange(opt.value); setOpen(false) }}
-                style={{ paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: C.border }}
+                style={{ paddingVertical: 16, paddingHorizontal: 8, borderBottomWidth: 1, borderBottomColor: C.border, minHeight: 44 }}
               >
                 <Text style={{
                   fontSize: 16,

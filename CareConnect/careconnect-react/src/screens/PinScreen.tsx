@@ -80,6 +80,10 @@ export default function PinScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: C.surface }}>
       <TouchableOpacity
+        accessible={true}
+        accessibilityRole="button"
+        accessibilityLabel="Back"
+        accessibilityHint="Go back to the previous screen"
         onPress={() => navigation.goBack()}
         style={{ position: 'absolute', top: 56, left: 24, flexDirection: 'row', alignItems: 'center', gap: 6, zIndex: 1 }}
       >
@@ -91,18 +95,35 @@ export default function PinScreen() {
 
         {pinExists === false ? (
           <>
-            <Text style={{ ...T.displayLarge, textAlign: 'center', marginBottom: 12 }}>No PIN Set</Text>
+            <Text
+              accessible={true}
+              accessibilityRole="header"
+              style={{ ...T.displayLarge, textAlign: 'center', marginBottom: 12 }}
+            >
+              No PIN Set
+            </Text>
             <Text style={{ ...T.bodyMedium, textAlign: 'center' }}>
               Sign in with your email first, then set up a PIN in Settings.
             </Text>
           </>
         ) : (
           <>
-            <Text style={{ ...T.displayLarge, textAlign: 'center', marginBottom: 8 }}>{title}</Text>
+            <Text
+              accessible={true}
+              accessibilityRole="header"
+              style={{ ...T.displayLarge, textAlign: 'center', marginBottom: 8 }}
+            >
+              {title}
+            </Text>
             <Text style={{ ...T.bodyMedium, textAlign: 'center', marginBottom: 48 }}>{subtitle}</Text>
 
             {/* 4 dots */}
-            <View style={{ flexDirection: 'row', gap: 20, marginBottom: 16 }}>
+            <View
+              accessible={true}
+              accessibilityLabel={`PIN entry, ${digits.length} of 4 digits entered`}
+              accessibilityLiveRegion="polite"
+              style={{ flexDirection: 'row', gap: 20, marginBottom: 16 }}
+            >
               {[0, 1, 2, 3].map(i => (
                 <View
                   key={i}
@@ -117,11 +138,20 @@ export default function PinScreen() {
             </View>
 
             <View style={{ height: 28, marginBottom: 8, justifyContent: 'center' }}>
-              {error ? <Text style={{ color: C.red, fontSize: 14, textAlign: 'center' }}>{error}</Text> : null}
+              {error ? (
+                <Text
+                  accessible={true}
+                  accessibilityRole="alert"
+                  accessibilityLiveRegion="assertive"
+                  style={{ color: C.red, fontSize: 14, textAlign: 'center' }}
+                >
+                  {error}
+                </Text>
+              ) : null}
             </View>
 
             {/* Numpad */}
-            <View style={{ width: 272 }}>
+            <View accessible={false} style={{ width: 272 }}>
               {[0, 1, 2, 3].map(row => (
                 <View key={row} style={{ flexDirection: 'row', gap: 16, marginBottom: 16, justifyContent: 'center' }}>
                   {KEYS.slice(row * 3, row * 3 + 3).map((key, col) =>
@@ -130,6 +160,10 @@ export default function PinScreen() {
                     ) : (
                       <TouchableOpacity
                         key={col}
+                        accessible={true}
+                        accessibilityRole="button"
+                        accessibilityLabel={key === '⌫' ? 'Delete digit' : `Digit ${key}`}
+                        accessibilityHint={key === '⌫' ? 'Remove the last entered digit' : `Enter digit ${key}`}
                         onPress={() => handleKey(key)}
                         style={{
                           width: 80, height: 80, borderRadius: 40,

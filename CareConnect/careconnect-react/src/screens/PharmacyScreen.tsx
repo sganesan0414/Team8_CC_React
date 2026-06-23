@@ -33,7 +33,11 @@ export default function PharmacyScreen() {
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20 }}>
 
         {/* Pharmacy Info */}
-        <View style={{ backgroundColor: C.primary, borderRadius: 16, padding: 20, marginBottom: 24 }}>
+        <View
+          accessible={true}
+          accessibilityLabel={`${pharmacy.name}. ${pharmacy.address}. ${pharmacy.phone}. ${pharmacy.hours}`}
+          style={{ backgroundColor: C.primary, borderRadius: 16, padding: 20, marginBottom: 24 }}
+        >
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 14 }}>
             <ShoppingBag size={24} color="white" />
             <Text style={{ ...T.titleLarge, color: 'white' }}>{pharmacy.name}</Text>
@@ -50,13 +54,15 @@ export default function PharmacyScreen() {
           ))}
         </View>
 
-        <Text style={{ ...T.headlineMedium, marginBottom: 12 }}>Prescription Refills</Text>
+        <Text accessible={true} accessibilityRole="header" style={{ ...T.headlineMedium, marginBottom: 12 }}>Prescription Refills</Text>
 
         {mockRefills.map(rx => {
           const isUrgent = rx.status === 'urgent'
           const isDueSoon = rx.status === 'due-soon'
           const borderColor = isUrgent ? C.red : isDueSoon ? C.warning : C.border
           const bgColor = isUrgent ? C.redBg : isDueSoon ? C.warningBg : C.surface
+
+          const refillLabel = isUrgent ? 'No refills' : `${rx.refillsLeft} left`
 
           return (
             <View key={rx.id} style={{ backgroundColor: bgColor, borderWidth: 1.5, borderColor, borderRadius: 16, padding: 16, marginBottom: 12 }}>
@@ -65,22 +71,32 @@ export default function PharmacyScreen() {
                   <Text style={{ ...T.labelLarge }}>{rx.name}</Text>
                   <Text style={{ ...T.caption, marginTop: 2 }}>Due: {rx.dueDate}</Text>
                 </View>
-                <View style={{
-                  backgroundColor: isUrgent ? C.red + '18' : isDueSoon ? C.warning + '18' : C.success + '18',
-                  borderWidth: 1,
-                  borderColor: isUrgent ? C.red : isDueSoon ? C.warning : C.success,
-                  borderRadius: 20, paddingVertical: 3, paddingHorizontal: 8,
-                }}>
+                <View
+                  accessible={true}
+                  accessibilityLabel={`Refills remaining: ${refillLabel}`}
+                  style={{
+                    backgroundColor: isUrgent ? C.red + '18' : isDueSoon ? C.warning + '18' : C.success + '18',
+                    borderWidth: 1,
+                    borderColor: isUrgent ? C.red : isDueSoon ? C.warning : C.success,
+                    borderRadius: 20, paddingVertical: 3, paddingHorizontal: 8,
+                  }}
+                >
                   <Text style={{ fontSize: 12, fontWeight: '700', color: isUrgent ? C.red : isDueSoon ? C.warning : C.success }}>
-                    {isUrgent ? 'No refills' : `${rx.refillsLeft} left`}
+                    {refillLabel}
                   </Text>
                 </View>
               </View>
-              <TouchableOpacity style={{
-                width: '100%', paddingVertical: 12, borderRadius: 12,
-                backgroundColor: isUrgent ? C.red : C.primary,
-                flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
-              }}>
+              <TouchableOpacity
+                accessible={true}
+                accessibilityRole="button"
+                accessibilityLabel={isUrgent ? `Request emergency refill for ${rx.name}` : `Request refill for ${rx.name}`}
+                accessibilityHint="Tap to request a prescription refill"
+                style={{
+                  width: '100%', paddingVertical: 12, borderRadius: 12,
+                  backgroundColor: isUrgent ? C.red : C.primary,
+                  flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
+                }}
+              >
                 <RefreshCw size={16} color="white" />
                 <Text style={{ color: 'white', fontWeight: '600', fontSize: 15 }}>
                   {isUrgent ? 'Request Emergency Refill' : 'Request Refill'}
@@ -90,9 +106,14 @@ export default function PharmacyScreen() {
           )
         })}
 
-        <Text style={{ ...T.headlineMedium, marginBottom: 12, marginTop: 8 }}>Recent Orders</Text>
+        <Text accessible={true} accessibilityRole="header" style={{ ...T.headlineMedium, marginBottom: 12, marginTop: 8 }}>Recent Orders</Text>
         {['Metformin 500 mg — Picked up Jun 1', 'Lisinopril 10 mg — Picked up May 18'].map(item => (
-          <View key={item} style={{ backgroundColor: C.surface, borderWidth: 1, borderColor: C.border, borderRadius: 12, paddingVertical: 12, paddingHorizontal: 16, marginBottom: 8, flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+          <View
+            key={item}
+            accessible={true}
+            accessibilityLabel={item}
+            style={{ backgroundColor: C.surface, borderWidth: 1, borderColor: C.border, borderRadius: 12, paddingVertical: 12, paddingHorizontal: 16, marginBottom: 8, flexDirection: 'row', alignItems: 'center', gap: 10 }}
+          >
             <CheckCircle size={18} color={C.success} />
             <Text style={{ ...T.bodyMedium }}>{item}</Text>
           </View>

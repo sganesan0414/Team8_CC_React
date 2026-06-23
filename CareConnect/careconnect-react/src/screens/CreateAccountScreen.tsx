@@ -42,10 +42,17 @@ export default function CreateAccountScreen() {
   }
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: C.surface }} contentContainerStyle={{ padding: 40, paddingHorizontal: 28 }}>
+    <ScrollView
+      style={{ flex: 1, backgroundColor: C.surface }}
+      contentContainerStyle={{ padding: 40, paddingHorizontal: 28 }}
+    >
 
       {/* Back */}
       <TouchableOpacity
+        accessible={true}
+        accessibilityRole="button"
+        accessibilityLabel="Back"
+        accessibilityHint="Go back to sign in screen"
         onPress={() => navigation.goBack()}
         style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 32 }}
       >
@@ -60,12 +67,19 @@ export default function CreateAccountScreen() {
         </View>
       </View>
 
-      <Text style={{ ...T.displayLarge, textAlign: 'center', marginBottom: 8 }}>Create Account</Text>
+      <Text accessible={true} accessibilityRole="header" style={{ ...T.displayLarge, textAlign: 'center', marginBottom: 8 }}>Create Account</Text>
       <Text style={{ ...T.bodyMedium, textAlign: 'center', marginBottom: 36 }}>Join CareConnect to manage your health</Text>
 
       {/* Auth error banner */}
       {authError ? (
-        <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10, backgroundColor: C.redBg, borderWidth: 1, borderColor: C.red, borderRadius: 10, padding: 12, marginBottom: 16 }}>
+        <View 
+          accessible={true}
+          accessibilityRole="alert"
+          accessibilityLabel="Account creation error"
+          accessibilityLiveRegion="assertive"
+          importantForAccessibility="yes"
+          style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10, backgroundColor: C.redBg, borderWidth: 1, borderColor: C.red, borderRadius: 10, padding: 12, marginBottom: 16 }}
+        >
           <AlertCircle size={18} color={C.red} style={{ marginTop: 1 }} />
           <View style={{ flex: 1 }}>
             <Text style={{ color: C.red, fontSize: 14, lineHeight: 20 }}>{authError}</Text>
@@ -86,13 +100,24 @@ export default function CreateAccountScreen() {
             <User size={18} color={fieldErrors.name ? C.red : C.textMuted} />
           </View>
           <TextInput
+            accessible={true}
+            accessibilityLabel="Full name"
+            accessibilityHint={fieldErrors.name ? `Error: ${fieldErrors.name}` : "Enter your full name"}
             value={name}
             onChangeText={v => { setName(v); clearField('name') }}
             placeholder="Jane Doe"
             style={{ ...inputBase, paddingLeft: 44, borderColor: fieldErrors.name ? C.red : C.border, borderWidth: fieldErrors.name ? 2 : 1.5 }}
           />
         </View>
-        {fieldErrors.name ? <Text style={{ color: C.red, fontSize: 13 }}>{fieldErrors.name}</Text> : null}
+        {fieldErrors.name ? (
+          <Text 
+            accessible={true}
+            accessibilityRole="alert"
+            style={{ color: C.red, fontSize: 13 }}
+          >
+            {fieldErrors.name}
+          </Text>
+        ) : null}
       </View>
 
       {/* Email */}
@@ -103,6 +128,9 @@ export default function CreateAccountScreen() {
             <Mail size={18} color={fieldErrors.email ? C.red : C.textMuted} />
           </View>
           <TextInput
+            accessible={true}
+            accessibilityLabel="Email address"
+            accessibilityHint={fieldErrors.email ? `Error: ${fieldErrors.email}` : "Enter a valid email address"}
             value={email}
             onChangeText={v => { setEmail(v); clearField('email') }}
             placeholder="jane@example.com"
@@ -111,7 +139,15 @@ export default function CreateAccountScreen() {
             style={{ ...inputBase, paddingLeft: 44, borderColor: fieldErrors.email ? C.red : C.border, borderWidth: fieldErrors.email ? 2 : 1.5 }}
           />
         </View>
-        {fieldErrors.email ? <Text style={{ color: C.red, fontSize: 13 }}>{fieldErrors.email}</Text> : null}
+        {fieldErrors.email ? (
+          <Text 
+            accessible={true}
+            accessibilityRole="alert"
+            style={{ color: C.red, fontSize: 13 }}
+          >
+            {fieldErrors.email}
+          </Text>
+        ) : null}
       </View>
 
       {/* Password */}
@@ -122,6 +158,9 @@ export default function CreateAccountScreen() {
             <Lock size={18} color={fieldErrors.password ? C.red : C.textMuted} />
           </View>
           <TextInput
+            accessible={true}
+            accessibilityLabel="Password"
+            accessibilityHint={fieldErrors.password ? `Error: ${fieldErrors.password}` : "Create a strong password (minimum 6 characters)"}
             value={password}
             onChangeText={v => { setPassword(v); clearField('password') }}
             placeholder="Create a strong password (min. 6 chars)"
@@ -129,16 +168,33 @@ export default function CreateAccountScreen() {
             style={{ ...inputBase, paddingLeft: 44, paddingRight: 48, borderColor: fieldErrors.password ? C.red : C.border, borderWidth: fieldErrors.password ? 2 : 1.5 }}
           />
           <TouchableOpacity
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel={showPassword ? "Hide password" : "Show password"}
+            accessibilityHint="Toggle password visibility"
             onPress={() => setShowPassword(!showPassword)}
-            style={{ position: 'absolute', right: 12, top: 0, bottom: 0, justifyContent: 'center' }}
+            style={{ position: 'absolute', right: 12, top: 0, bottom: 0, justifyContent: 'center', paddingHorizontal: 8 }}
           >
             {showPassword ? <EyeOff size={18} color={C.textMuted} /> : <Eye size={18} color={C.textMuted} />}
           </TouchableOpacity>
         </View>
-        {fieldErrors.password ? <Text style={{ color: C.red, fontSize: 13 }}>{fieldErrors.password}</Text> : null}
+        {fieldErrors.password ? (
+          <Text
+            accessible={true}
+            accessibilityRole="alert"
+            style={{ color: C.red, fontSize: 13 }}
+          >
+            {fieldErrors.password}
+          </Text>
+        ) : null}
       </View>
 
       <TouchableOpacity
+        accessible={true}
+        accessibilityRole="button"
+        accessibilityLabel="Create account"
+        accessibilityHint={isLoading ? "Creating account, please wait" : "Tap to create your account"}
+        accessibilityState={{ disabled: isLoading }}
         onPress={handleCreate}
         disabled={isLoading}
         style={{ ...btnPrimary, opacity: isLoading ? 0.7 : 1 }}

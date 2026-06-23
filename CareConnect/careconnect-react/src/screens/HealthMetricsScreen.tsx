@@ -35,7 +35,7 @@ export default function HealthMetricsScreen() {
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20 }}>
 
         {/* Vitals Grid - 2 column */}
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 24 }}>
+        <View accessible={false} style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 24 }}>
           {metrics.map(m => (
             <View key={m.id} style={{ width: '48%' }}>
               <VitalCard metric={m} />
@@ -43,7 +43,13 @@ export default function HealthMetricsScreen() {
           ))}
         </View>
 
-        <Text style={{ ...T.headlineMedium, marginBottom: 12 }}>Add Reading</Text>
+        <Text 
+          accessible={true}
+          accessibilityRole="header"
+          style={{ ...T.headlineMedium, marginBottom: 12 }}
+        >
+          Add Reading
+        </Text>
 
         <Select
           value={selectedMetricId}
@@ -54,6 +60,9 @@ export default function HealthMetricsScreen() {
         />
 
         <TextInput
+          accessible={true}
+          accessibilityLabel="Metric value"
+          accessibilityHint="Enter the reading value for the selected metric"
           value={inputValue}
           onChangeText={setInputValue}
           placeholder="Enter reading value"
@@ -62,6 +71,11 @@ export default function HealthMetricsScreen() {
         />
 
         <TouchableOpacity
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Save reading"
+          accessibilityHint={isAddingReading ? "Saving, please wait" : "Tap to save your health metric reading"}
+          accessibilityState={{ disabled: isAddingReading || !selectedMetricId || !inputValue }}
           onPress={handleSave}
           disabled={isAddingReading || !selectedMetricId || !inputValue}
           style={{ ...btnPrimary, opacity: (isAddingReading || !selectedMetricId || !inputValue) ? 0.6 : 1, marginBottom: 28 }}
@@ -72,7 +86,13 @@ export default function HealthMetricsScreen() {
           }
         </TouchableOpacity>
 
-        <Text style={{ ...T.headlineMedium, marginBottom: 12 }}>Recent Readings</Text>
+        <Text 
+          accessible={true}
+          accessibilityRole="header"
+          style={{ ...T.headlineMedium, marginBottom: 12 }}
+        >
+          Recent Readings
+        </Text>
         {metrics.flatMap(m =>
           [...m.history].reverse().slice(0, 3).map((r, i) => (
             <ReadingRow key={`${m.id}-${i}`} metricName={m.name} unit={m.unit} reading={r} />

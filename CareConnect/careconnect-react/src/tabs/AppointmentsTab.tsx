@@ -70,8 +70,13 @@ export default function AppointmentsTab({ onNavChange: _ }: Props) {
       )}
 
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-        <Text style={{ ...T.headlineMedium }}>Your Appointments</Text>
+        <Text accessible={true} accessibilityRole="header" style={{ ...T.headlineMedium }}>Your Appointments</Text>
         <TouchableOpacity
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Add appointment"
+          accessibilityHint="Tap to open the new appointment form"
+          accessibilityState={{ expanded: showAddForm }}
           onPress={() => setShowAddForm(!showAddForm)}
           style={{ backgroundColor: C.primary, borderRadius: 8, paddingVertical: 6, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', gap: 4 }}
         >
@@ -82,7 +87,7 @@ export default function AppointmentsTab({ onNavChange: _ }: Props) {
 
       {showAddForm && (
         <View style={{ backgroundColor: C.surface, borderWidth: 1, borderColor: C.border, borderRadius: 16, padding: 16, marginBottom: 16 }}>
-          <Text style={{ ...T.titleLarge, marginBottom: 12 }}>New Appointment</Text>
+          <Text accessible={true} accessibilityRole="header" style={{ ...T.titleLarge, marginBottom: 12 }}>New Appointment</Text>
           {[
             { label: 'Doctor Name', value: newDoctor,    setter: setNewDoctor,    placeholder: 'Dr. Jane Smith',      keyboard: 'default' as const },
             { label: 'Specialty',   value: newSpecialty, setter: setNewSpecialty, placeholder: 'Primary Care',        keyboard: 'default' as const },
@@ -92,6 +97,9 @@ export default function AppointmentsTab({ onNavChange: _ }: Props) {
             <View key={f.label} style={{ gap: 4, marginBottom: 10 }}>
               <Text style={{ ...T.labelMedium }}>{f.label}</Text>
               <TextInput
+                accessible={true}
+                accessibilityLabel={f.label}
+                accessibilityHint={`Enter ${f.label.toLowerCase()}`}
                 value={f.value}
                 onChangeText={f.setter}
                 placeholder={f.placeholder}
@@ -102,6 +110,11 @@ export default function AppointmentsTab({ onNavChange: _ }: Props) {
           ))}
           <View style={{ flexDirection: 'row', gap: 10 }}>
             <TouchableOpacity
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel="Add appointment"
+              accessibilityHint="Tap to save the new appointment"
+              accessibilityState={{ disabled: !newDoctor || !newDate }}
               onPress={handleAdd}
               disabled={!newDoctor || !newDate}
               style={{ flex: 1, paddingVertical: 12, borderRadius: 10, backgroundColor: C.primary, alignItems: 'center', opacity: (!newDoctor || !newDate) ? 0.5 : 1 }}
@@ -109,6 +122,10 @@ export default function AppointmentsTab({ onNavChange: _ }: Props) {
               <Text style={{ color: 'white', fontWeight: '600' }}>Add Appointment</Text>
             </TouchableOpacity>
             <TouchableOpacity
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel="Cancel"
+              accessibilityHint="Tap to close the new appointment form"
               onPress={() => setShowAddForm(false)}
               style={{ flex: 1, paddingVertical: 12, borderRadius: 10, borderWidth: 1.5, borderColor: C.border, backgroundColor: 'transparent', alignItems: 'center' }}
             >
@@ -150,6 +167,10 @@ function ApptTile({ appointment: a, onTap }: { appointment: Appointment; onTap: 
 
   return (
     <TouchableOpacity
+      accessible={true}
+      accessibilityRole="button"
+      accessibilityLabel={`${a.doctorName}, ${a.specialty}, ${dateStr} at ${timeStr}, ${st.label}`}
+      accessibilityHint="Tap to view appointment details"
       onPress={onTap}
       style={{ width: '100%', backgroundColor: st.bg, borderWidth: 1.5, borderColor: st.border, borderRadius: 16, padding: 16, marginBottom: 12 }}
     >
@@ -183,16 +204,36 @@ function DetailModal({ appt: a, onClose, onCancel }: { appt: Appointment; onClos
   const screenHeight = Dimensions.get('window').height
 
   return (
-    <Modal visible transparent animationType="slide" onRequestClose={onClose}>
+    <Modal
+      visible
+      transparent
+      animationType="slide"
+      onRequestClose={onClose}
+      accessibilityLabel={`Appointment details for ${a.doctorName}`}
+    >
       <View style={{ flex: 1, justifyContent: 'flex-end' }}>
-        <TouchableOpacity style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)' }} onPress={onClose} activeOpacity={1} />
+        <TouchableOpacity
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Close appointment details"
+          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)' }}
+          onPress={onClose}
+          activeOpacity={1}
+        />
         <View style={{ backgroundColor: C.surface, borderRadius: 20, padding: 24, paddingBottom: 32, maxHeight: screenHeight * 0.85 }}>
           <View style={{ width: 40, height: 4, backgroundColor: C.border, borderRadius: 2, alignSelf: 'center', marginBottom: 20 }} />
-          <TouchableOpacity onPress={onClose} style={{ position: 'absolute', top: 20, right: 20 }}>
+          <TouchableOpacity
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel="Close"
+            accessibilityHint="Close appointment details"
+            onPress={onClose}
+            style={{ position: 'absolute', top: 20, right: 20 }}
+          >
             <X size={22} color={C.textMuted} />
           </TouchableOpacity>
 
-          <Text style={{ ...T.headlineMedium, marginBottom: 4 }}>{a.doctorName}</Text>
+          <Text accessible={true} accessibilityRole="header" style={{ ...T.headlineMedium, marginBottom: 4 }}>{a.doctorName}</Text>
           <Text style={{ ...T.bodyMedium, marginBottom: 16 }}>{a.specialty}</Text>
 
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
@@ -205,18 +246,28 @@ function DetailModal({ appt: a, onClose, onCancel }: { appt: Appointment; onClos
           </View>
           {a.notes ? (
             <>
-              <Text style={{ ...T.labelLarge, marginBottom: 4 }}>Notes</Text>
+              <Text accessible={true} accessibilityRole="header" style={{ ...T.labelLarge, marginBottom: 4 }}>Notes</Text>
               <Text style={{ ...T.bodyMedium, marginBottom: 16 }}>{a.notes}</Text>
             </>
           ) : null}
 
           {a.status === 'upcoming' && (
             <>
-              <TouchableOpacity style={{ width: '100%', paddingVertical: 14, borderRadius: 12, borderWidth: 1.5, borderColor: C.border, backgroundColor: 'transparent', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 10 }}>
+              <TouchableOpacity
+                accessible={true}
+                accessibilityRole="button"
+                accessibilityLabel="Reschedule"
+                accessibilityHint="Tap to reschedule this appointment"
+                style={{ width: '100%', paddingVertical: 14, borderRadius: 12, borderWidth: 1.5, borderColor: C.border, backgroundColor: 'transparent', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 10 }}
+              >
                 <Edit2 size={16} color={C.textPrimary} />
                 <Text style={{ color: C.textPrimary, fontWeight: '600', fontSize: 15 }}>Reschedule</Text>
               </TouchableOpacity>
               <TouchableOpacity
+                accessible={true}
+                accessibilityRole="button"
+                accessibilityLabel="Cancel appointment"
+                accessibilityHint={`Tap to cancel the appointment with ${a.doctorName}`}
                 onPress={onCancel}
                 style={{ width: '100%', paddingVertical: 14, borderRadius: 12, borderWidth: 1.5, borderColor: C.red, backgroundColor: C.redBg, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 }}
               >

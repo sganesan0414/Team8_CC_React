@@ -48,10 +48,17 @@ export default function ForgotPasswordScreen() {
   }
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: C.surface }} contentContainerStyle={{ padding: 40, paddingHorizontal: 28 }}>
+    <ScrollView
+      style={{ flex: 1, backgroundColor: C.surface }}
+      contentContainerStyle={{ padding: 40, paddingHorizontal: 28 }}
+    >
 
       {/* Back */}
       <TouchableOpacity
+        accessible={true}
+        accessibilityRole="button"
+        accessibilityLabel="Back"
+        accessibilityHint="Go back to sign in screen"
         onPress={() => navigation.goBack()}
         style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 32 }}
       >
@@ -70,24 +77,49 @@ export default function ForgotPasswordScreen() {
         /* Success state */
         <View style={{ alignItems: 'center', gap: 16 }}>
           <CheckCircle size={56} color={C.success} />
-          <Text style={{ ...T.displayLarge, textAlign: 'center' }}>Password Reset!</Text>
+          <Text
+            accessible={true}
+            accessibilityRole="header"
+            style={{ ...T.displayLarge, textAlign: 'center' }}
+          >
+            Password Reset!
+          </Text>
           <Text style={{ ...T.bodyMedium, textAlign: 'center', marginBottom: 24 }}>
             Your password has been updated. You can now sign in with your new password.
           </Text>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={{ ...btnPrimary }}>
+          <TouchableOpacity
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel="Back to sign in"
+            accessibilityHint="Tap to return to the sign in screen"
+            onPress={() => navigation.goBack()}
+            style={{ ...btnPrimary }}
+          >
             <Text style={{ color: C.textOnPrimary, fontSize: 16, fontWeight: '600' }}>Back to Sign In</Text>
           </TouchableOpacity>
         </View>
       ) : step === 'email' ? (
         /* Step 1 — find account */
         <>
-          <Text style={{ ...T.displayLarge, textAlign: 'center', marginBottom: 8 }}>Forgot Password</Text>
+          <Text
+            accessible={true}
+            accessibilityRole="header"
+            style={{ ...T.displayLarge, textAlign: 'center', marginBottom: 8 }}
+          >
+            Forgot Password
+          </Text>
           <Text style={{ ...T.bodyMedium, textAlign: 'center', marginBottom: 36 }}>
             Enter the email address associated with your account.
           </Text>
 
           {error ? (
-            <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10, backgroundColor: C.redBg, borderWidth: 1, borderColor: C.red, borderRadius: 10, padding: 12, marginBottom: 16 }}>
+            <View
+              accessible={true}
+              accessibilityRole="alert"
+              accessibilityLiveRegion="assertive"
+              importantForAccessibility="yes"
+              style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10, backgroundColor: C.redBg, borderWidth: 1, borderColor: C.red, borderRadius: 10, padding: 12, marginBottom: 16 }}
+            >
               <AlertCircle size={18} color={C.red} style={{ marginTop: 1 }} />
               <Text style={{ color: C.red, fontSize: 14, flex: 1, lineHeight: 20 }}>{error}</Text>
             </View>
@@ -100,6 +132,9 @@ export default function ForgotPasswordScreen() {
                 <Mail size={18} color={C.textMuted} />
               </View>
               <TextInput
+                accessible={true}
+                accessibilityLabel="Email address"
+                accessibilityHint={error ? `Error: ${error}` : "Enter the email address associated with your account"}
                 value={email}
                 onChangeText={v => { setEmail(v); setError('') }}
                 placeholder="user@example.com"
@@ -111,7 +146,16 @@ export default function ForgotPasswordScreen() {
             </View>
           </View>
 
-          <TouchableOpacity onPress={handleEmailSubmit} disabled={isLoading} style={{ ...btnPrimary, opacity: isLoading ? 0.7 : 1 }}>
+          <TouchableOpacity
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel="Find my account"
+            accessibilityHint={isLoading ? "Looking up account, please wait" : "Tap to look up your account by email"}
+            accessibilityState={{ disabled: isLoading }}
+            onPress={handleEmailSubmit}
+            disabled={isLoading}
+            style={{ ...btnPrimary, opacity: isLoading ? 0.7 : 1 }}
+          >
             {isLoading
               ? <ActivityIndicator size="small" color="white" />
               : <Text style={{ color: C.textOnPrimary, fontSize: 16, fontWeight: '600' }}>Find My Account</Text>
@@ -121,14 +165,26 @@ export default function ForgotPasswordScreen() {
       ) : (
         /* Step 2 — set new password */
         <>
-          <Text style={{ ...T.displayLarge, textAlign: 'center', marginBottom: 8 }}>Reset Password</Text>
+          <Text
+            accessible={true}
+            accessibilityRole="header"
+            style={{ ...T.displayLarge, textAlign: 'center', marginBottom: 8 }}
+          >
+            Reset Password
+          </Text>
           <Text style={{ ...T.bodyMedium, textAlign: 'center', marginBottom: 36 }}>
             Choose a new password for{'\n'}
             <Text style={{ fontWeight: '600', color: C.textPrimary }}>{email}</Text>
           </Text>
 
           {error ? (
-            <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10, backgroundColor: C.redBg, borderWidth: 1, borderColor: C.red, borderRadius: 10, padding: 12, marginBottom: 16 }}>
+            <View
+              accessible={true}
+              accessibilityRole="alert"
+              accessibilityLiveRegion="assertive"
+              importantForAccessibility="yes"
+              style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10, backgroundColor: C.redBg, borderWidth: 1, borderColor: C.red, borderRadius: 10, padding: 12, marginBottom: 16 }}
+            >
               <AlertCircle size={18} color={C.red} style={{ marginTop: 1 }} />
               <Text style={{ color: C.red, fontSize: 14, flex: 1, lineHeight: 20 }}>{error}</Text>
             </View>
@@ -141,6 +197,9 @@ export default function ForgotPasswordScreen() {
                 <Lock size={18} color={C.textMuted} />
               </View>
               <TextInput
+                accessible={true}
+                accessibilityLabel="New password"
+                accessibilityHint="Create a new password, minimum 6 characters"
                 value={newPassword}
                 onChangeText={v => { setNewPassword(v); setError('') }}
                 placeholder="Min. 6 characters"
@@ -148,6 +207,10 @@ export default function ForgotPasswordScreen() {
                 style={{ ...inputBase, paddingLeft: 44, paddingRight: 48 }}
               />
               <TouchableOpacity
+                accessible={true}
+                accessibilityRole="button"
+                accessibilityLabel={showNew ? "Hide password" : "Show password"}
+                accessibilityHint="Toggle password visibility"
                 onPress={() => setShowNew(!showNew)}
                 style={{ position: 'absolute', right: 12, top: 0, bottom: 0, justifyContent: 'center' }}
               >
@@ -163,6 +226,9 @@ export default function ForgotPasswordScreen() {
                 <Lock size={18} color={C.textMuted} />
               </View>
               <TextInput
+                accessible={true}
+                accessibilityLabel="Confirm password"
+                accessibilityHint="Re-enter your new password"
                 value={confirmPassword}
                 onChangeText={v => { setConfirmPassword(v); setError('') }}
                 placeholder="Repeat new password"
@@ -170,6 +236,10 @@ export default function ForgotPasswordScreen() {
                 style={{ ...inputBase, paddingLeft: 44, paddingRight: 48 }}
               />
               <TouchableOpacity
+                accessible={true}
+                accessibilityRole="button"
+                accessibilityLabel={showConfirm ? "Hide password" : "Show password"}
+                accessibilityHint="Toggle password visibility"
                 onPress={() => setShowConfirm(!showConfirm)}
                 style={{ position: 'absolute', right: 12, top: 0, bottom: 0, justifyContent: 'center' }}
               >
@@ -178,7 +248,16 @@ export default function ForgotPasswordScreen() {
             </View>
           </View>
 
-          <TouchableOpacity onPress={handleReset} disabled={isLoading} style={{ ...btnPrimary, opacity: isLoading ? 0.7 : 1 }}>
+          <TouchableOpacity
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel="Reset password"
+            accessibilityHint={isLoading ? "Resetting password, please wait" : "Tap to reset your password"}
+            accessibilityState={{ disabled: isLoading }}
+            onPress={handleReset}
+            disabled={isLoading}
+            style={{ ...btnPrimary, opacity: isLoading ? 0.7 : 1 }}
+          >
             {isLoading
               ? <ActivityIndicator size="small" color="white" />
               : <Text style={{ color: C.textOnPrimary, fontSize: 16, fontWeight: '600' }}>Reset Password</Text>

@@ -30,6 +30,7 @@ export default function ToastContainer() {
 
   return (
     <View
+      accessible={false}
       pointerEvents="box-none"
       style={{
         position: 'absolute',
@@ -41,21 +42,36 @@ export default function ToastContainer() {
       }}
     >
       {toasts.map(t => (
-        <View key={t.id} style={{
-          backgroundColor: C.textPrimary,
-          borderRadius: 12,
-          paddingVertical: 12,
-          paddingHorizontal: 16,
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          gap: 12,
-          elevation: 4,
-        }}>
+        <View 
+          key={t.id}
+          accessible={true}
+          accessibilityRole="alert"
+          accessibilityLabel={t.message}
+          accessibilityLiveRegion="polite"
+          importantForAccessibility="yes"
+          style={{
+            backgroundColor: C.textPrimary,
+            borderRadius: 12,
+            paddingVertical: 12,
+            paddingHorizontal: 16,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: 12,
+            elevation: 4,
+          }}
+        >
           <Text style={{ fontSize: 15, color: C.textOnPrimary, flex: 1 }}>{t.message}</Text>
           {t.action && (
-            <TouchableOpacity onPress={t.action.onClick} style={{ flexShrink: 0 }}>
-              <Text style={{ color: '#93C5FD', fontWeight: '600', fontSize: 14 }}>{t.action.label}</Text>
+            <TouchableOpacity 
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel={t.action.label}
+              accessibilityHint="Perform action for this message"
+              onPress={t.action.onClick} 
+              style={{ flexShrink: 0, paddingVertical: 4, paddingHorizontal: 2 }}
+            >
+              <Text style={{ color: C.primary, fontWeight: '600', fontSize: 14 }}>{t.action.label}</Text>
             </TouchableOpacity>
           )}
         </View>

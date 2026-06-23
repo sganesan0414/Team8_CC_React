@@ -54,13 +54,21 @@ export default function SettingsScreen() {
             <View style={{ backgroundColor: C.surface, borderRadius: 16, borderWidth: 1, borderColor: C.border, overflow: 'hidden' }}>
               {section.items.map((item, i) => {
                 const Icon = item.icon
+                const isEnabled = Boolean(item.route)
                 return (
                   <TouchableOpacity
                     key={item.label}
-                    onPress={() => item.route ? navigation.navigate(item.route as keyof RootStackParamList) : undefined}
+                    accessible={true}
+                    accessibilityRole="button"
+                    accessibilityLabel={item.label}
+                    accessibilityHint={isEnabled ? `Open ${item.label}` : `${item.label} is not available yet`}
+                    accessibilityState={{ disabled: !isEnabled }}
+                    onPress={isEnabled ? () => navigation.navigate(item.route as keyof RootStackParamList) : undefined}
+                    disabled={!isEnabled}
                     style={{
                       flexDirection: 'row', alignItems: 'center', gap: 14,
                       paddingVertical: 14, paddingHorizontal: 16,
+                      opacity: isEnabled ? 1 : 0.5,
                       borderTopWidth: i > 0 ? 1 : 0, borderTopColor: C.border,
                     }}
                   >
@@ -78,6 +86,10 @@ export default function SettingsScreen() {
 
         {/* Sign Out */}
         <TouchableOpacity
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Sign out"
+          accessibilityHint="Sign out of your CareConnect account"
           onPress={() => signOut()}
           style={{
             width: '100%', paddingVertical: 14, paddingHorizontal: 16, borderRadius: 16,

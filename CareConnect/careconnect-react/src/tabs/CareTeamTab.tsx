@@ -47,8 +47,13 @@ export default function CareTeamTab({ onNavChange: _ }: Props) {
       )}
 
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <Text style={{ ...T.headlineMedium }}>Care Team Members</Text>
+        <Text accessible={true} accessibilityRole="header" style={{ ...T.headlineMedium }}>Care Team Members</Text>
         <TouchableOpacity
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Add team member"
+          accessibilityHint="Tap to open the new team member form"
+          accessibilityState={{ expanded: showForm }}
           onPress={() => setShowForm(!showForm)}
           style={{ backgroundColor: C.primary, borderRadius: 8, paddingVertical: 6, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', gap: 4 }}
         >
@@ -59,7 +64,7 @@ export default function CareTeamTab({ onNavChange: _ }: Props) {
 
       {showForm && (
         <View style={{ backgroundColor: C.surface, borderWidth: 1, borderColor: C.border, borderRadius: 16, padding: 16, marginBottom: 20 }}>
-          <Text style={{ ...T.titleLarge, marginBottom: 12 }}>New Team Member</Text>
+          <Text accessible={true} accessibilityRole="header" style={{ ...T.titleLarge, marginBottom: 12 }}>New Team Member</Text>
           {[
             { label: 'Full Name *', value: name,  setter: setName,  keyboard: 'default' as const, placeholder: 'Dr. Jane Smith' },
             { label: 'Role *',      value: role,  setter: setRole,  keyboard: 'default' as const, placeholder: 'Cardiologist' },
@@ -68,12 +73,25 @@ export default function CareTeamTab({ onNavChange: _ }: Props) {
           ].map(f => (
             <View key={f.label} style={{ gap: 4, marginBottom: 10 }}>
               <Text style={{ ...T.labelMedium }}>{f.label}</Text>
-              <TextInput value={f.value} onChangeText={f.setter} placeholder={f.placeholder} keyboardType={f.keyboard} style={{ ...inputBase }} />
+              <TextInput
+                accessible={true}
+                accessibilityLabel={f.label.replace(' *', '')}
+                accessibilityHint={`Enter ${f.label.replace(' *', '').toLowerCase()}`}
+                value={f.value}
+                onChangeText={f.setter}
+                placeholder={f.placeholder}
+                keyboardType={f.keyboard}
+                style={{ ...inputBase }}
+              />
             </View>
           ))}
 
           {/* Emergency contact toggle */}
           <TouchableOpacity
+            accessible={true}
+            accessibilityRole="checkbox"
+            accessibilityLabel="Set as emergency contact"
+            accessibilityState={{ checked: isEmergency }}
             onPress={() => setIsEmergency(!isEmergency)}
             style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 14 }}
           >
@@ -91,6 +109,11 @@ export default function CareTeamTab({ onNavChange: _ }: Props) {
 
           <View style={{ flexDirection: 'row', gap: 10 }}>
             <TouchableOpacity
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel="Add member"
+              accessibilityHint="Tap to save the new team member"
+              accessibilityState={{ disabled: !name || !role }}
               onPress={handleAdd}
               disabled={!name || !role}
               style={{ flex: 1, paddingVertical: 12, borderRadius: 10, backgroundColor: C.primary, alignItems: 'center', opacity: (!name || !role) ? 0.5 : 1 }}
@@ -98,6 +121,10 @@ export default function CareTeamTab({ onNavChange: _ }: Props) {
               <Text style={{ color: 'white', fontWeight: '600' }}>Add Member</Text>
             </TouchableOpacity>
             <TouchableOpacity
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel="Cancel"
+              accessibilityHint="Tap to close the new team member form"
               onPress={() => setShowForm(false)}
               style={{ flex: 1, paddingVertical: 12, borderRadius: 10, borderWidth: 1.5, borderColor: C.border, backgroundColor: 'transparent', alignItems: 'center' }}
             >
@@ -120,7 +147,7 @@ function MemberCard({ member, onRemove }: { member: CareTeamMember; onRemove: ()
   return (
     <View style={{ backgroundColor: C.surface, borderWidth: 1.5, borderColor: member.isEmergencyContact ? C.red + '66' : C.border, borderRadius: 16, padding: 16, marginBottom: 12 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 12 }}>
-        <View style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: C.primary + '18', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        <View accessible={false} style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: C.primary + '18', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
           <Text style={{ ...T.titleLarge, color: C.primary }}>{initials}</Text>
         </View>
         <View style={{ flex: 1 }}>
@@ -134,27 +161,48 @@ function MemberCard({ member, onRemove }: { member: CareTeamMember; onRemove: ()
           </View>
           <Text style={{ ...T.bodyMedium }}>{member.role}</Text>
         </View>
-        <TouchableOpacity onPress={onRemove} style={{ padding: 6 }}>
+        <TouchableOpacity
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel={`Remove ${member.name}`}
+          accessibilityHint="Tap to remove this care team member"
+          onPress={onRemove}
+          style={{ padding: 6 }}
+        >
           <Trash2 size={18} color={C.textMuted} />
         </TouchableOpacity>
       </View>
 
       <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
-        {member.phone && (
-          <View style={{ flex: 1, backgroundColor: C.surfaceVariant, borderRadius: 8, paddingVertical: 6, paddingHorizontal: 10, flexDirection: 'row', alignItems: 'center', gap: 6, overflow: 'hidden' }}>
+        {member.phone.length > 0 && (
+          <View
+            accessible={true}
+            accessibilityLabel={`Phone: ${member.phone}`}
+            style={{ flex: 1, backgroundColor: C.surfaceVariant, borderRadius: 8, paddingVertical: 6, paddingHorizontal: 10, flexDirection: 'row', alignItems: 'center', gap: 6, overflow: 'hidden' }}
+          >
             <Phone size={14} color={C.textMuted} />
             <Text numberOfLines={1} style={{ ...T.caption }}>{member.phone}</Text>
           </View>
         )}
-        {member.email && (
-          <View style={{ flex: 1, backgroundColor: C.surfaceVariant, borderRadius: 8, paddingVertical: 6, paddingHorizontal: 10, flexDirection: 'row', alignItems: 'center', gap: 6, overflow: 'hidden' }}>
+        {member.email.length > 0 && (
+          <View
+            accessible={true}
+            accessibilityLabel={`Email: ${member.email}`}
+            style={{ flex: 1, backgroundColor: C.surfaceVariant, borderRadius: 8, paddingVertical: 6, paddingHorizontal: 10, flexDirection: 'row', alignItems: 'center', gap: 6, overflow: 'hidden' }}
+          >
             <Mail size={14} color={C.textMuted} />
             <Text numberOfLines={1} style={{ ...T.caption }}>{member.email}</Text>
           </View>
         )}
       </View>
 
-      <TouchableOpacity style={{ width: '100%', paddingVertical: 12, borderRadius: 12, borderWidth: 1.5, borderColor: C.border, backgroundColor: 'transparent', alignItems: 'center' }}>
+      <TouchableOpacity
+        accessible={true}
+        accessibilityRole="button"
+        accessibilityLabel={`Manage access for ${member.name}`}
+        accessibilityHint="Tap to manage this care team member's access"
+        style={{ width: '100%', paddingVertical: 12, borderRadius: 12, borderWidth: 1.5, borderColor: C.border, backgroundColor: 'transparent', alignItems: 'center' }}
+      >
         <Text style={{ color: C.textSecondary, fontWeight: '600', fontSize: 15 }}>Manage Access</Text>
       </TouchableOpacity>
     </View>

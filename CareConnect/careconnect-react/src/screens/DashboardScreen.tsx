@@ -49,16 +49,31 @@ export default function DashboardScreen() {
         alignItems: 'center',
         gap: 8,
       }}>
-        <Text style={{ flex: 1, fontSize: 20, fontWeight: '700', color: 'white' }}>{titles[navIndex]}</Text>
+        <Text 
+          accessible={true}
+          accessibilityRole="header"
+          accessibilityLabel={`Page: ${titles[navIndex]}`}
+          style={{ flex: 1, fontSize: 20, fontWeight: '700', color: 'white' }}
+        >
+          {titles[navIndex]}
+        </Text>
         <TouchableOpacity
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Settings"
+          accessibilityHint="Tap to open settings menu"
           onPress={() => navigation.navigate('Settings')}
-          style={{ padding: 8 }}
+          style={{ padding: 11, minWidth: 44, minHeight: 44, alignItems: 'center', justifyContent: 'center' }}
         >
           <Settings size={22} color="white" />
         </TouchableOpacity>
         <TouchableOpacity
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Sign out"
+          accessibilityHint="Tap to sign out of your account"
           onPress={() => signOut()}
-          style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 8, paddingHorizontal: 4 }}
+          style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 8, paddingHorizontal: 8 }}
         >
           <LogOut size={18} color="white" />
           <Text style={{ color: 'white', fontSize: 14 }}>Sign out</Text>

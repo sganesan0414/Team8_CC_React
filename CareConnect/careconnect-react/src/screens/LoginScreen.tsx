@@ -76,7 +76,10 @@ export default function LoginScreen() {
   }
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: C.surface }} contentContainerStyle={{ padding: 40, paddingHorizontal: 28 }}>
+    <ScrollView
+      style={{ flex: 1, backgroundColor: C.surface }}
+      contentContainerStyle={{ padding: 40, paddingHorizontal: 28 }}
+    >
 
       {/* Logo */}
       <View style={{ alignItems: 'center', marginBottom: 28 }}>
@@ -85,12 +88,18 @@ export default function LoginScreen() {
         </View>
       </View>
 
-      <Text style={{ ...T.displayLarge, textAlign: 'center', marginBottom: 8 }}>Welcome Back</Text>
+      <Text accessible={true} accessibilityRole="header" style={{ ...T.displayLarge, textAlign: 'center', marginBottom: 8 }}>Welcome Back</Text>
       <Text style={{ ...T.bodyMedium, textAlign: 'center', marginBottom: 40 }}>Sign in to continue to CareConnect</Text>
 
       {/* Quick Sign In */}
-      <Text style={{ ...T.titleLarge, color: C.primary, marginBottom: 14 }}>Quick Sign In</Text>
-      <View style={{ flexDirection: 'row', gap: 14, marginBottom: 32 }}>
+      <Text 
+        accessible={true}
+        accessibilityRole="header"
+        style={{ ...T.titleLarge, color: C.primary, marginBottom: 14 }}
+      >
+        Quick Sign In
+      </Text>
+      <View accessible={false} style={{ flexDirection: 'row', gap: 14, marginBottom: 32 }}>
         {[
           { icon: Fingerprint, label: 'Fingerprint', type: LocalAuthentication.AuthenticationType.FINGERPRINT },
           { icon: Scan,        label: 'Face ID',     type: LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION },
@@ -99,6 +108,11 @@ export default function LoginScreen() {
           return (
             <TouchableOpacity
               key={label}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel={label}
+              accessibilityHint={available ? `Use ${label} to sign in` : `${label} is not available on this device`}
+              accessibilityState={{ disabled: !available }}
               onPress={available ? handleBiometric : undefined}
               style={{
                 flex: 1, height: 96, borderRadius: 14,
@@ -125,7 +139,14 @@ export default function LoginScreen() {
 
       {/* Auth error banner */}
       {authError ? (
-        <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10, backgroundColor: C.redBg, borderWidth: 1, borderColor: C.red, borderRadius: 10, padding: 12, marginBottom: 16 }}>
+        <View 
+          accessible={true}
+          accessibilityRole="alert"
+          accessibilityLabel="Sign in error"
+          accessibilityLiveRegion="assertive"
+          importantForAccessibility="yes"
+          style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10, backgroundColor: C.redBg, borderWidth: 1, borderColor: C.red, borderRadius: 10, padding: 12, marginBottom: 16 }}
+        >
           <AlertCircle size={18} color={C.red} style={{ marginTop: 1 }} />
           <Text style={{ color: C.red, fontSize: 14, flex: 1, lineHeight: 20 }}>{authError}</Text>
         </View>
@@ -139,6 +160,10 @@ export default function LoginScreen() {
             <Mail size={18} color={fieldErrors.email ? C.red : C.textMuted} />
           </View>
           <TextInput
+            accessible={true}
+            accessibilityLabel="Email address"
+            accessibilityHint={fieldErrors.email ? `Error: ${fieldErrors.email}` : "Enter your email address to sign in"}
+            accessibilityState={{ disabled: false }}
             value={email}
             onChangeText={handleEmailChange}
             placeholder="user@example.com"
@@ -150,7 +175,15 @@ export default function LoginScreen() {
             style={{ ...inputBase, paddingLeft: 44, borderColor: fieldErrors.email ? C.red : emailFocused ? C.primary : C.border, borderWidth: fieldErrors.email || emailFocused ? 2 : 1.5 }}
           />
         </View>
-        {fieldErrors.email ? <Text style={{ color: C.red, fontSize: 13 }}>{fieldErrors.email}</Text> : null}
+        {fieldErrors.email ? (
+          <Text 
+            accessible={true}
+            accessibilityRole="alert"
+            style={{ color: C.red, fontSize: 13 }}
+          >
+            {fieldErrors.email}
+          </Text>
+        ) : null}
       </View>
 
       {/* Password */}
@@ -161,6 +194,10 @@ export default function LoginScreen() {
             <Lock size={18} color={fieldErrors.password ? C.red : C.textMuted} />
           </View>
           <TextInput
+            accessible={true}
+            accessibilityLabel="Password"
+            accessibilityHint={fieldErrors.password ? `Error: ${fieldErrors.password}` : "Enter your password"}
+            accessibilityState={{ disabled: false }}
             value={password}
             onChangeText={handlePasswordChange}
             placeholder="Enter your password"
@@ -171,24 +208,47 @@ export default function LoginScreen() {
             style={{ ...inputBase, paddingLeft: 44, paddingRight: 48, borderColor: fieldErrors.password ? C.red : passwordFocused ? C.primary : C.border, borderWidth: fieldErrors.password || passwordFocused ? 2 : 1.5 }}
           />
           <TouchableOpacity
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel={showPassword ? "Hide password" : "Show password"}
+            accessibilityHint="Toggle password visibility"
             onPress={() => setShowPassword(!showPassword)}
-            style={{ position: 'absolute', right: 12, top: 0, bottom: 0, justifyContent: 'center' }}
+            style={{ position: 'absolute', right: 12, top: 0, bottom: 0, justifyContent: 'center', paddingHorizontal: 8 }}
           >
             {showPassword ? <EyeOff size={18} color={C.textMuted} /> : <Eye size={18} color={C.textMuted} />}
           </TouchableOpacity>
         </View>
-        {fieldErrors.password ? <Text style={{ color: C.red, fontSize: 13 }}>{fieldErrors.password}</Text> : null}
+        {fieldErrors.password ? (
+          <Text 
+            accessible={true}
+            accessibilityRole="alert"
+            style={{ color: C.red, fontSize: 13 }}
+          >
+            {fieldErrors.password}
+          </Text>
+        ) : null}
       </View>
 
       {/* Forgot password */}
       <View style={{ alignItems: 'flex-end', marginBottom: 24 }}>
-        <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
+        <TouchableOpacity 
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Forgot password"
+          accessibilityHint="Tap to reset your password"
+          onPress={() => navigation.navigate('ForgotPassword')}
+        >
           <Text style={{ color: C.primary, fontWeight: '600', fontSize: 14 }}>Forgot Password?</Text>
         </TouchableOpacity>
       </View>
 
       {/* Sign In */}
       <TouchableOpacity
+        accessible={true}
+        accessibilityRole="button"
+        accessibilityLabel="Sign in"
+        accessibilityHint={isLoading ? "Signing in, please wait" : "Tap to sign in with email and password"}
+        accessibilityState={{ disabled: isLoading }}
         onPress={handleSignIn}
         disabled={isLoading}
         style={{ ...btnPrimary, marginBottom: 12, opacity: isLoading ? 0.7 : 1 }}
@@ -209,6 +269,10 @@ export default function LoginScreen() {
       {/* PIN */}
       {pinAvailable && (
         <TouchableOpacity
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Use PIN instead"
+          accessibilityHint="Tap to sign in with PIN"
           onPress={() => navigation.navigate('PinEntry')}
           style={{ ...btnOutlined, marginBottom: 8 }}
         >
@@ -220,13 +284,25 @@ export default function LoginScreen() {
       {/* Create account */}
       <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 4, marginBottom: 8 }}>
         <Text style={{ ...T.bodyMedium }}>Don't have an account?</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('CreateAccount')}>
+        <TouchableOpacity 
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Create account"
+          accessibilityHint="Tap to create a new account"
+          onPress={() => navigation.navigate('CreateAccount')}
+        >
           <Text style={{ color: C.primary, fontWeight: '600', fontSize: 15 }}>Create Account</Text>
         </TouchableOpacity>
       </View>
 
       {/* Help */}
-      <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 10 }}>
+      <TouchableOpacity 
+        accessible={true}
+        accessibilityRole="button"
+        accessibilityLabel="Contact caregiver"
+        accessibilityHint="Tap to contact your caregiver for help"
+        style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 10 }}
+      >
         <Users size={18} color={C.textMuted} />
         <Text style={{ color: C.textMuted, fontSize: 15 }}>Need help? Contact my Caregiver</Text>
       </TouchableOpacity>

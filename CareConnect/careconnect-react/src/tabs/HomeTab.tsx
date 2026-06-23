@@ -50,20 +50,30 @@ export default function HomeTab({ onNavChange }: Props) {
       {/* Hero banner */}
       <View style={{ backgroundColor: C.primary, borderRadius: 20, padding: 24, marginBottom: 24 }}>
         <TouchableOpacity
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel={`Go to profile: ${name}`}
+          accessibilityHint="Tap to view your profile information"
           onPress={() => navigation.navigate('Profile')}
           style={{ marginBottom: 4 }}
         >
           <Text style={{ ...T.displayLarge, color: 'white' }}>Good Morning, {name}</Text>
         </TouchableOpacity>
-        <Text style={{ ...T.bodyMedium, color: 'rgba(255,255,255,0.75)', marginBottom: 20 }}>{todayLabel}</Text>
+        <Text style={{ ...T.bodyMedium, color: 'rgba(255,255,255,0.9)', marginBottom: 20 }}>{todayLabel}</Text>
 
-        <View style={{ flexDirection: 'row', gap: 8 }}>
+        <View accessible={false} style={{ flexDirection: 'row', gap: 8 }}>
           {[
             { icon: Pill,       value: `${takenCount}/${medications.length}`, label: 'Medications\nToday',    color: C.accent },
             { icon: TrendingUp, value: '94%',                                  label: 'Adherence\nRate',       color: C.success },
             { icon: Calendar,   value: nextAppt ? `${SHORT_MONTHS[nextAppt.dateTime.getMonth()]} ${nextAppt.dateTime.getDate()}` : 'None', label: 'Next\nAppointment', color: C.accent },
           ].map(({ icon: Icon, value, label, color }) => (
-            <View key={label} style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 14, padding: 12 }}>
+            <View
+              key={label}
+              accessible={true}
+              accessibilityRole="image"
+              accessibilityLabel={`${label.replace(/\n/g, ' ')}: ${value}`}
+              style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 14, padding: 12 }}
+            >
               <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
                 <Icon size={14} color="white" />
               </View>
@@ -75,11 +85,21 @@ export default function HomeTab({ onNavChange }: Props) {
       </View>
 
       {/* Quick Actions */}
-      <Text style={{ ...T.headlineMedium, marginBottom: 14 }}>Quick Actions</Text>
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 24 }}>
+      <Text 
+        accessible={true}
+        accessibilityRole="header"
+        style={{ ...T.headlineMedium, marginBottom: 14 }}
+      >
+        Quick Actions
+      </Text>
+      <View accessible={false} style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 24 }}>
         {quickActions.map(({ icon: Icon, label, color, onPress }) => (
           <TouchableOpacity
             key={label}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel={label.replace(/\n/g, ' ')}
+            accessibilityHint={`Tap to open ${label.replace(/\n/g, ' ').toLowerCase()}`}
             onPress={onPress}
             style={{
               backgroundColor: C.surface, borderWidth: 1, borderColor: C.border,
@@ -87,7 +107,7 @@ export default function HomeTab({ onNavChange }: Props) {
               width: '48%', gap: 10, minHeight: 90,
             }}
           >
-            <View style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: color + '18', alignItems: 'center', justifyContent: 'center' }}>
+            <View accessible={false} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: color + '18', alignItems: 'center', justifyContent: 'center' }}>
               <Icon size={22} color={color} />
             </View>
             <Text style={{ ...T.labelLarge }}>{label}</Text>
@@ -107,8 +127,20 @@ export default function HomeTab({ onNavChange }: Props) {
       {/* Upcoming Medications */}
       <View style={{ marginTop: 24 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-          <Text style={{ ...T.headlineMedium }}>Upcoming Medications</Text>
-          <TouchableOpacity onPress={() => onNavChange(1)}>
+          <Text 
+            accessible={true}
+            accessibilityRole="header"
+            style={{ ...T.headlineMedium }}
+          >
+            Upcoming Medications
+          </Text>
+          <TouchableOpacity 
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel="View all medications"
+            accessibilityHint="Tap to see all your medications"
+            onPress={() => onNavChange(1)}
+          >
             <Text style={{ color: C.primary, fontWeight: '600', fontSize: 14 }}>View All</Text>
           </TouchableOpacity>
         </View>
@@ -135,7 +167,7 @@ export default function HomeTab({ onNavChange }: Props) {
 
       {/* Next Appointment */}
       <View style={{ marginTop: 24, marginBottom: 32 }}>
-        <Text style={{ ...T.headlineMedium, marginBottom: 12 }}>Next Appointment</Text>
+        <Text accessible={true} accessibilityRole="header" style={{ ...T.headlineMedium, marginBottom: 12 }}>Next Appointment</Text>
         {nextAppt ? (
           <View style={{ backgroundColor: C.infoBg, borderWidth: 1.5, borderColor: C.primary + '30', borderRadius: 16, padding: 18 }}>
             <Text style={{ ...T.titleLarge, marginBottom: 2 }}>{nextAppt.doctorName}</Text>
@@ -149,6 +181,10 @@ export default function HomeTab({ onNavChange }: Props) {
               <Text style={{ ...T.bodyMedium }}>{formatTime(nextAppt.dateTime)}</Text>
             </View>
             <TouchableOpacity
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel="View all appointments"
+              accessibilityHint="Tap to see all your appointments"
               onPress={() => onNavChange(2)}
               style={{ width: '100%', paddingVertical: 12, borderRadius: 12, borderWidth: 1.5, borderColor: C.border, backgroundColor: 'transparent', alignItems: 'center' }}
             >

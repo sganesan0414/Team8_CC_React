@@ -12,25 +12,49 @@ interface Props {
 
 export default function AlertBanner({ icon: Icon, title, body, actionLabel, onAction }: Props) {
   return (
-    <View style={{
-      backgroundColor: C.alertBg,
-      borderWidth: 1.5,
-      borderColor: C.alertBorder,
-      borderRadius: 14,
-      padding: 14,
-      paddingHorizontal: 16,
-      flexDirection: 'row',
-      gap: 12,
-      alignItems: 'flex-start',
-    }}>
-      <View style={{ flexShrink: 0, marginTop: 2 }}>
+    <View
+      accessible={true}
+      accessibilityRole="alert"
+      accessibilityLabel={title}
+      accessibilityHint={body}
+      style={{
+        backgroundColor: C.alertBg,
+        borderWidth: 1.5,
+        borderColor: C.alertBorder,
+        borderRadius: 14,
+        padding: 14,
+        paddingHorizontal: 16,
+        flexDirection: 'row',
+        gap: 12,
+        alignItems: 'flex-start',
+      }}
+    >
+      <View 
+        accessible={true}
+        accessibilityRole="image"
+        accessibilityLabel={`Alert: ${title}`}
+        style={{ flexShrink: 0, marginTop: 2 }}
+      >
         <Icon size={20} color={C.warning} />
       </View>
       <View style={{ flex: 1 }}>
-        <Text style={{ ...T.labelLarge, marginBottom: 2 }}>{title}</Text>
+        <Text 
+          accessible={true}
+          accessibilityRole="header"
+          style={{ ...T.labelLarge, marginBottom: 2 }}
+        >
+          {title}
+        </Text>
         <Text style={{ ...T.bodyMedium, fontSize: 14 }}>{body}</Text>
         {actionLabel && onAction && (
-          <TouchableOpacity onPress={onAction} style={{ marginTop: 8 }}>
+          <TouchableOpacity 
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel={actionLabel}
+            accessibilityHint={`Perform action: ${actionLabel}`}
+            onPress={onAction} 
+            style={{ marginTop: 8, paddingVertical: 4, paddingHorizontal: 2 }}
+          >
             <Text style={{ color: C.primary, fontWeight: '600', fontSize: 14 }}>{actionLabel} →</Text>
           </TouchableOpacity>
         )}

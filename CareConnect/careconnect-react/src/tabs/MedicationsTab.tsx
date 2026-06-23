@@ -39,13 +39,21 @@ export default function MedicationsTab({ onNavChange: _ }: Props) {
           <Search size={18} color={C.textMuted} />
         </View>
         <TextInput
+          accessible={true}
+          accessibilityLabel="Search medications"
+          accessibilityRole="search"
+          accessibilityHint="Enter a medication name to filter the list"
           value={searchQuery}
           onChangeText={setSearchQuery}
           placeholder="Search medications…"
           style={{ ...inputBase, paddingLeft: 44, paddingRight: searchQuery ? 44 : 16 }}
         />
-        {searchQuery && (
+        {searchQuery.length > 0 && (
           <TouchableOpacity
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel="Clear search"
+            accessibilityHint="Tap to clear the search field"
             onPress={() => setSearchQuery('')}
             style={{ position: 'absolute', right: 12, top: 0, bottom: 0, justifyContent: 'center' }}
           >
@@ -84,7 +92,11 @@ function MedCard({ med, isCooling, onMarkTaken }: { med: Medication; isCooling: 
           <Text style={{ ...T.bodyMedium, color: borderColor }}>{med.dose}</Text>
         </View>
         {med.taken && (
-          <View style={{ backgroundColor: C.successBg, borderWidth: 1, borderColor: C.success, borderRadius: 20, paddingVertical: 4, paddingHorizontal: 10, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+          <View
+            accessible={true}
+            accessibilityLabel="Taken"
+            style={{ backgroundColor: C.successBg, borderWidth: 1, borderColor: C.success, borderRadius: 20, paddingVertical: 4, paddingHorizontal: 10, flexDirection: 'row', alignItems: 'center', gap: 4 }}
+          >
             <CheckCircle size={13} color={C.success} />
             <Text style={{ ...T.caption, color: C.success, fontWeight: '700' }}>Taken</Text>
           </View>
@@ -102,6 +114,11 @@ function MedCard({ med, isCooling, onMarkTaken }: { med: Medication; isCooling: 
 
       {!med.taken || isCooling ? (
         <TouchableOpacity
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel={`Mark ${med.name} as taken`}
+          accessibilityHint={isCooling ? "Marking medication as taken" : "Tap to mark this medication as taken"}
+          accessibilityState={{ disabled: isCooling }}
           onPress={onMarkTaken}
           disabled={isCooling}
           style={{
@@ -116,11 +133,15 @@ function MedCard({ med, isCooling, onMarkTaken }: { med: Medication; isCooling: 
           }
         </TouchableOpacity>
       ) : (
-        <View style={{
-          width: '100%', paddingVertical: 14, borderRadius: 12,
-          borderWidth: 1.5, borderColor: C.success, backgroundColor: 'transparent',
-          flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
-        }}>
+        <View
+          accessible={true}
+          accessibilityLabel={`${med.name} taken`}
+          style={{
+            width: '100%', paddingVertical: 14, borderRadius: 12,
+            borderWidth: 1.5, borderColor: C.success, backgroundColor: 'transparent',
+            flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
+          }}
+        >
           <CheckCircle size={18} color={C.success} />
           <Text style={{ color: C.success, fontWeight: '600', fontSize: 16 }}>Taken</Text>
         </View>

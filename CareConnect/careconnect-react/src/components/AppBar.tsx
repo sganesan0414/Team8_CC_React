@@ -14,30 +14,42 @@ export default function AppBar({ title, onBack, backLabel = 'Back', actions }: P
   const insets = useSafeAreaInsets()
 
   return (
-    <View style={{
-      backgroundColor: C.primary,
-      paddingTop: insets.top,
-      paddingHorizontal: 16,
-      height: 56 + insets.top,
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 12,
-      flexShrink: 0,
-    }}>
+    <View
+      style={{
+        backgroundColor: C.primary,
+        paddingTop: insets.top,
+        paddingHorizontal: 16,
+        height: 56 + insets.top,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+        flexShrink: 0,
+      }}
+    >
       {onBack && (
         <TouchableOpacity
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel={backLabel}
+          accessibilityHint={`Go back to previous screen`}
           onPress={onBack}
-          style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 8, flexShrink: 0 }}
+          style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 10, paddingHorizontal: 8, flexShrink: 0 }}
         >
           <ArrowLeft size={20} color={C.textOnPrimary} />
           <Text style={{ fontSize: 14, fontWeight: '500', color: C.textOnPrimary }}>{backLabel}</Text>
         </TouchableOpacity>
       )}
-      <Text numberOfLines={1} style={{ flex: 1, fontSize: 20, fontWeight: '700', color: C.textOnPrimary }}>
+      <Text 
+        numberOfLines={1} 
+        accessible={true}
+        accessibilityRole="header"
+        accessibilityLabel={`Page: ${title}`}
+        style={{ flex: 1, fontSize: 20, fontWeight: '700', color: C.textOnPrimary }}
+      >
         {title}
       </Text>
       {actions && (
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>{actions}</View>
+        <View accessible={false} style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>{actions}</View>
       )}
     </View>
   )

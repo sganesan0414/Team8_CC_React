@@ -39,7 +39,11 @@ export default function RemindersTab({ onNavChange: _ }: Props) {
   return (
     <View style={{ padding: 20 }}>
       {/* Summary */}
-      <View style={{ backgroundColor: C.primary, borderRadius: 16, padding: 20, marginBottom: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+      <View
+        accessible={true}
+        accessibilityLabel={`${enabledCount} active reminders, ${reminders.length - enabledCount} paused`}
+        style={{ backgroundColor: C.primary, borderRadius: 16, padding: 20, marginBottom: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}
+      >
         <View>
           <Text style={{ ...T.titleLarge, color: 'white' }}>{enabledCount} Active Reminders</Text>
           <Text style={{ ...T.bodyMedium, color: 'rgba(255,255,255,0.75)' }}>{reminders.length - enabledCount} paused</Text>
@@ -50,8 +54,13 @@ export default function RemindersTab({ onNavChange: _ }: Props) {
       </View>
 
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <Text style={{ ...T.headlineMedium }}>My Reminders</Text>
+        <Text accessible={true} accessibilityRole="header" style={{ ...T.headlineMedium }}>My Reminders</Text>
         <TouchableOpacity
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Add reminder"
+          accessibilityHint="Tap to open the new reminder form"
+          accessibilityState={{ expanded: showForm }}
           onPress={() => setShowForm(!showForm)}
           style={{ backgroundColor: C.primary, borderRadius: 8, paddingVertical: 6, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', gap: 4 }}
         >
@@ -62,22 +71,41 @@ export default function RemindersTab({ onNavChange: _ }: Props) {
 
       {showForm && (
         <View style={{ backgroundColor: C.surface, borderWidth: 1, borderColor: C.border, borderRadius: 16, padding: 16, marginBottom: 20 }}>
-          <Text style={{ ...T.titleLarge, marginBottom: 12 }}>New Reminder</Text>
+          <Text accessible={true} accessibilityRole="header" style={{ ...T.titleLarge, marginBottom: 12 }}>New Reminder</Text>
 
           <View style={{ gap: 4, marginBottom: 10 }}>
             <Text style={{ ...T.labelMedium }}>Title *</Text>
-            <TextInput value={title} onChangeText={setTitle} placeholder="e.g. Take evening medication" style={{ ...inputBase }} />
+            <TextInput
+              accessible={true}
+              accessibilityLabel="Title"
+              accessibilityHint="Enter a title for this reminder"
+              value={title}
+              onChangeText={setTitle}
+              placeholder="e.g. Take evening medication"
+              style={{ ...inputBase }}
+            />
           </View>
 
           <View style={{ gap: 4, marginBottom: 10 }}>
             <Text style={{ ...T.labelMedium }}>Description</Text>
-            <TextInput value={description} onChangeText={setDescription} placeholder="Optional details" style={{ ...inputBase }} />
+            <TextInput
+              accessible={true}
+              accessibilityLabel="Description"
+              accessibilityHint="Enter optional details for this reminder"
+              value={description}
+              onChangeText={setDescription}
+              placeholder="Optional details"
+              style={{ ...inputBase }}
+            />
           </View>
 
           <View style={{ flexDirection: 'row', gap: 10, marginBottom: 14 }}>
             <View style={{ flex: 1, gap: 4 }}>
               <Text style={{ ...T.labelMedium }}>Time (HH:MM)</Text>
               <TextInput
+                accessible={true}
+                accessibilityLabel="Time"
+                accessibilityHint="Enter the reminder time in hours and minutes"
                 value={time}
                 onChangeText={setTime}
                 placeholder="08:00"
@@ -98,6 +126,11 @@ export default function RemindersTab({ onNavChange: _ }: Props) {
 
           <View style={{ flexDirection: 'row', gap: 10 }}>
             <TouchableOpacity
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel="Add reminder"
+              accessibilityHint="Tap to save the new reminder"
+              accessibilityState={{ disabled: !title }}
               onPress={handleAdd}
               disabled={!title}
               style={{ flex: 1, paddingVertical: 12, borderRadius: 10, backgroundColor: C.primary, alignItems: 'center', opacity: !title ? 0.5 : 1 }}
@@ -105,6 +138,10 @@ export default function RemindersTab({ onNavChange: _ }: Props) {
               <Text style={{ color: 'white', fontWeight: '600' }}>Add Reminder</Text>
             </TouchableOpacity>
             <TouchableOpacity
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel="Cancel"
+              accessibilityHint="Tap to close the new reminder form"
               onPress={() => setShowForm(false)}
               style={{ flex: 1, paddingVertical: 12, borderRadius: 10, borderWidth: 1.5, borderColor: C.border, backgroundColor: 'transparent', alignItems: 'center' }}
             >
@@ -142,10 +179,24 @@ function ReminderCard({ reminder: r, onToggle, onRemove }: { reminder: Reminder;
           {r.description ? <Text style={{ ...T.bodyMedium, fontSize: 14 }}>{r.description}</Text> : null}
         </View>
         <View style={{ flexDirection: 'row', gap: 4 }}>
-          <TouchableOpacity onPress={onToggle} style={{ padding: 6 }}>
+          <TouchableOpacity
+            accessible={true}
+            accessibilityRole="switch"
+            accessibilityLabel={r.enabled ? `Pause ${r.title}` : `Resume ${r.title}`}
+            accessibilityState={{ checked: r.enabled }}
+            onPress={onToggle}
+            style={{ padding: 6 }}
+          >
             {r.enabled ? <Bell size={20} color={C.primary} /> : <BellOff size={20} color={C.textMuted} />}
           </TouchableOpacity>
-          <TouchableOpacity onPress={onRemove} style={{ padding: 6 }}>
+          <TouchableOpacity
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel={`Remove ${r.title}`}
+            accessibilityHint="Tap to delete this reminder"
+            onPress={onRemove}
+            style={{ padding: 6 }}
+          >
             <Trash2 size={18} color={C.red} />
           </TouchableOpacity>
         </View>
